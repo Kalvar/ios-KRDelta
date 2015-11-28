@@ -17,6 +17,7 @@ typedef enum KRDeltaActiveFunctions
 
 typedef void(^KRDeltaCompletion)(BOOL success, NSArray *weights, NSInteger totalIteration);
 typedef void(^KRDeltaIteration)(NSInteger iteration, NSArray *weights);
+typedef void(^KRDeltaDirectOutput)(NSArray *outputs);
 
 @interface KRDelta : NSObject
 
@@ -36,9 +37,11 @@ typedef void(^KRDeltaIteration)(NSInteger iteration, NSArray *weights);
 -(instancetype)init;
 
 -(void)addPatterns:(NSArray *)_inputs target:(double)_targetValue;
--(void)setWeights:(NSArray *)_initWeights;
+-(void)setupWeights:(NSArray *)_initWeights;
 -(void)training;
--(void)trainingWithCompletion:(KRDeltaCompletion)_completion;
+-(void)trainingWithCompletion:(KRDeltaCompletion)_completionBlock;
+-(void)trainingWithIteration:(KRDeltaIteration)_iterationBlock completion:(KRDeltaCompletion)_completionBlock;
+-(void)directOutputByPatterns:(NSArray *)_inputs completion:(KRDeltaDirectOutput)_completionBlock;
 
 -(void)setTrainingCompletion:(KRDeltaCompletion)_block;
 -(void)setTrainingIteraion:(KRDeltaIteration)_block;

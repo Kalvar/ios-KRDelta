@@ -11,7 +11,7 @@
 @interface KRDelta ()
 
 @property (nonatomic, assign) NSInteger iteration;
-@property (nonatomic, assign) double sumError;
+@property (nonatomic, assign) double sumError; // Iteration errors
 
 @end
 
@@ -120,25 +120,19 @@
     NSArray *_weights           = self.weights;
     float _learningRate         = self.learningRate;
     double _netOutput           = [self _fOfNetWithInputs:_inputs];
-    
     double _errorValue          = _targetValue - _netOutput;
-    self.sumError              += ( _errorValue * _errorValue ) * 0.5f;
-    
     double _dashOutput          = [self _fDashOfNet:_netOutput];
     
     // new weights = learning rate * (target value - net output) * f'(net) * x1 + w1
-    double _sigmaValue     = _learningRate * (_targetValue - _netOutput) * _dashOutput;
+    double _sigmaValue          = _learningRate * (_targetValue - _netOutput) * _dashOutput;
+    NSArray *_deltaWeights      = [self _multiplyMatrix:_inputs byNumber:_sigmaValue];
+    NSArray *_newWeights        = [self _plusMatrix:_weights anotherMatrix:_deltaWeights];
     
-    
-    
-    NSArray *_deltaWeights = [self _multiplyMatrix:_inputs byNumber:_sigmaValue];
-    NSArray *_newWeights   = [self _plusMatrix:_weights anotherMatrix:_deltaWeights];
-
     [self.weights removeAllObjects];
     [self.weights addObjectsFromArray:_newWeights];
     
-    
-
+    // Sums the error values
+    self.sumError              += ( _errorValue * _errorValue ) * 0.5f;
 }
 
 @end
@@ -171,7 +165,7 @@
         _maxIteration     = 1;
         _convergenceValue = 0.0f;
         
-        _activeFunction   = KRDeltaActiveFunctionBySgn;
+        _activeFunction   = KRDeltaActiveFunctionByTanh;
     }
     return self;
 }
@@ -183,7 +177,7 @@
     [_targets addObject:[NSNumber numberWithDouble:_targetValue]];
 }
 
--(void)setWeights:(NSArray *)_initWeights
+-(void)setupWeights:(NSArray *)_initWeights
 {
     if( [_weights count] > 0 )
     {
@@ -195,7 +189,7 @@
 -(void)training
 {
     ++_iteration;
-    
+    _sumError               = 0.0f;
     NSInteger _patternIndex = -1;
     for( NSArray *_inputs in _patterns )
     {
@@ -203,7 +197,8 @@
         [self _turningWeightsByInputs:_inputs targetValue:[[_targets objectAtIndex:_patternIndex] doubleValue]];
     }
     
-    if( _iteration >= _maxIteration || _convergenceValue )
+    // One iteration done then doing next adjust conditions
+    if( _iteration >= _maxIteration || [self _mseBySumError:_sumError] <= _convergenceValue )
     {
         if( nil != _trainingCompletion )
         {
@@ -220,10 +215,25 @@
     }
 }
 
--(void)trainingWithCompletion:(KRDeltaCompletion)_completion
+-(void)trainingWithCompletion:(KRDeltaCompletion)_completionBlock
 {
-    _trainingCompletion = _completion;
+    _trainingCompletion = _completionBlock;
     [self training];
+}
+
+-(void)trainingWithIteration:(KRDeltaIteration)_iterationBlock completion:(KRDeltaCompletion)_completionBlock
+{
+    _trainingIteraion = _iterationBlock;
+    [self trainingWithCompletion:_completionBlock];
+}
+
+-(void)directOutputByPatterns:(NSArray *)_inputs completion:(KRDeltaDirectOutput)_completionBlock
+{
+    double _netOutput = [self _fOfNetWithInputs:_inputs];
+    if( nil != _completionBlock )
+    {
+        _completionBlock(@[[NSNumber numberWithDouble:_netOutput]]);
+    }
 }
 
 #pragma --mark Block Setters
