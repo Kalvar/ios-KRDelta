@@ -98,10 +98,14 @@
     switch (self.activeFunction)
     {
         case KRDeltaActiveFunctionByTanh:
-            _dashedValue = ( 1.0f - ( _outputValue * _outputValue ) ) * 0.5f;
+            // Derivative = (1 - y) * (1 + y)
+            _dashedValue  = ( 1.0f - _outputValue ) * ( 1.0f * _outputValue );
+            // Customized derivative method
+            //_dashedValue = ( 1.0f - ( _outputValue * _outputValue ) ) * 0.5f;
             break;
         case KRDeltaActiveFunctionBySigmoid:
-            _dashedValue = _outputValue * ( 1.0f - _outputValue );
+            // Derivative = (1 - y) * y
+            _dashedValue = ( 1.0f - _outputValue ) * _outputValue;
             break;
         default:
             _dashedValue = _outputValue;
