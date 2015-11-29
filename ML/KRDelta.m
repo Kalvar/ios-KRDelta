@@ -170,7 +170,7 @@
     return self;
 }
 
-#pragma --mark Public Hebbian Algorithm
+#pragma --mark Public Methods
 -(void)addPatterns:(NSArray *)_inputs target:(double)_targetValue
 {
     [_patterns addObject:_inputs];
