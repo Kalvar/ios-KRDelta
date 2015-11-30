@@ -6,7 +6,7 @@ KRDelta is implemented by Delta Learning Method in Machine Learning that is also
 
 ```ruby
 platform :ios, '7.0'
-pod "KRDelta", "~> 1.0.0"
+pod "KRDelta", "~> 1.1.0"
 ```
 
 ## How To Get Started
@@ -25,7 +25,8 @@ _delta.convergenceValue = 0.001f;
 _delta.maxIteration     = 1000;
 [_delta addPatterns:@[@1.0f, @-2.0f, @0.0f, @-1.0f] target:-1.0f];
 [_delta addPatterns:@[@0.0f, @1.5f, @-0.5f, @-1.0f] target:1.0f];
-[_delta setupWeights:@[@1.0f, @-1.0f, @0.0f, @0.5f]];
+//[_delta setupWeights:@[@1.0f, @-1.0f, @0.0f, @0.5f]];
+[_delta randomWeights];
 [_delta trainingWithIteration:^(NSInteger iteration, NSArray *weights) {
     NSLog(@"Doing %li iteration : %@", iteration, weights);
 } completion:^(BOOL success, NSArray *weights, NSInteger totalIteration) {
@@ -38,7 +39,7 @@ _delta.maxIteration     = 1000;
 
 ## Version
 
-V1.0.0
+V1.1.0
 
 ## LICENSE
 

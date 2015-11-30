@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "KRDelta"
-  s.version      = "1.0.0"
+  s.version      = "1.1.0"
   s.summary      = "KRDelta is implemented by Delta Learning Method in Machine Learning that is also a supervisor and used gradient method to find out the best solution."
   s.description  = <<-DESC
                    Flexible using this method with neural network and classification methods could combine together.

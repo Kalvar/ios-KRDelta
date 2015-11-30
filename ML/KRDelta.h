@@ -38,6 +38,8 @@ typedef void(^KRDeltaDirectOutput)(NSArray *outputs);
 
 -(void)addPatterns:(NSArray *)_inputs target:(double)_targetValue;
 -(void)setupWeights:(NSArray *)_initWeights;
+-(void)randomWeights;
+
 -(void)training;
 -(void)trainingWithCompletion:(KRDeltaCompletion)_completionBlock;
 -(void)trainingWithIteration:(KRDeltaIteration)_iterationBlock completion:(KRDeltaCompletion)_completionBlock;

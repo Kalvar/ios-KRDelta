@@ -8,6 +8,9 @@
 
 #import "KRDelta.h"
 
+#define DEFAULT_RANDOM_MAX 0.5f
+#define DEFAULT_RANDOM_MIN -0.5f
+
 @interface KRDelta ()
 
 @property (nonatomic, assign) NSInteger iteration;
@@ -41,6 +44,15 @@
         ++_index;
     }
     return _array;
+}
+
+@end
+
+@implementation KRDelta (fixMaths)
+
+-(double)_randomMax:(double)_maxValue min:(double)_minValue
+{
+    return ((double)arc4random() / ( RAND_MAX * 2.0f ) ) * (_maxValue - _minValue) + _minValue;
 }
 
 @end
@@ -98,8 +110,9 @@
     switch (self.activeFunction)
     {
         case KRDeltaActiveFunctionByTanh:
+            // The original formula : (1 - y^2) * 入 / 2
             // Derivative = (1 - y) * (1 + y) = (1 - y^2)
-            //_dashedValue  = ( 1.0f - _outputValue ) * ( 1.0f * _outputValue );
+            //_dashedValue = ( 1.0f - _outputValue ) * ( 1.0f * _outputValue );
             // Optimized derivative method since this methods used tahn() that 入 is 1.0 not standard 2.0
             _dashedValue = ( 1.0f - ( _outputValue * _outputValue ) ) * 0.5f;
             break;
@@ -114,29 +127,34 @@
     return _dashedValue;
 }
 
--(double)_mseBySumError:(double)_sumError
+-(double)_calculateIterationError
 {
-    return (_sumError / [self.patterns count]) * 0.5f;
+    // MSE
+    return (self.sumError / [self.patterns count]) * 0.5f;
+}
+
+-(void)_sumError:(double)_errorValue
+{
+    self.sumError += ( _errorValue * _errorValue );
 }
 
 -(void)_turningWeightsByInputs:(NSArray *)_inputs targetValue:(double)_targetValue
 {
-    NSArray *_weights           = self.weights;
-    float _learningRate         = self.learningRate;
-    double _netOutput           = [self _fOfNetWithInputs:_inputs];
-    double _errorValue          = _targetValue - _netOutput;
-    double _dashOutput          = [self _fDashOfNet:_netOutput];
+    NSArray *_weights      = self.weights;
+    float _learningRate    = self.learningRate;
+    double _netOutput      = [self _fOfNetWithInputs:_inputs];
+    double _errorValue     = _targetValue - _netOutput;
+    double _dashOutput     = [self _fDashOfNet:_netOutput];
     
     // new weights = learning rate * (target value - net output) * f'(net) * x1 + w1
-    double _sigmaValue          = _learningRate * (_targetValue - _netOutput) * _dashOutput;
-    NSArray *_deltaWeights      = [self _multiplyMatrix:_inputs byNumber:_sigmaValue];
-    NSArray *_newWeights        = [self _plusMatrix:_weights anotherMatrix:_deltaWeights];
+    double _sigmaValue     = _learningRate * (_targetValue - _netOutput) * _dashOutput;
+    NSArray *_deltaWeights = [self _multiplyMatrix:_inputs byNumber:_sigmaValue];
+    NSArray *_newWeights   = [self _plusMatrix:_weights anotherMatrix:_deltaWeights];
     
     [self.weights removeAllObjects];
     [self.weights addObjectsFromArray:_newWeights];
     
-    // Sums the error values
-    self.sumError              += ( _errorValue * _errorValue ) * 0.5f;
+    [self _sumError:_errorValue];
 }
 
 @end
@@ -190,6 +208,19 @@
     [_weights addObjectsFromArray:_initWeights];
 }
 
+-(void)randomWeights
+{
+    // Follows the inputs count to decide how many weights it needs.
+    [_weights removeAllObjects];
+    NSInteger _inputNetCount = [[_patterns firstObject] count];
+    double _inputMax         = DEFAULT_RANDOM_MAX / _inputNetCount;
+    double _inputMin         = DEFAULT_RANDOM_MIN / _inputNetCount;
+    for( int i=0; i<_inputNetCount; i++ )
+    {
+        [_weights addObject:[NSNumber numberWithDouble:[self _randomMax:_inputMax min:_inputMin]]];
+    }
+}
+
 -(void)training
 {
     ++_iteration;
@@ -202,7 +233,7 @@
     }
     
     // One iteration done then doing next adjust conditions
-    if( _iteration >= _maxIteration || [self _mseBySumError:_sumError] <= _convergenceValue )
+    if( _iteration >= _maxIteration || [self _calculateIterationError] <= _convergenceValue )
     {
         if( nil != _trainingCompletion )
         {
