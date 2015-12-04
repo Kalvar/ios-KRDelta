@@ -77,6 +77,24 @@
     return ( _sgnValue >= 0.0f ) ? 1.0f : -1.0f;
 }
 
+-(double)_activateOutputValue:(double)_netOutput
+{
+    double _activatedValue = 0.0f;
+    switch (self.activeFunction)
+    {
+        case KRDeltaActiveFunctionByTanh:
+            _activatedValue = [self _fOfTanh:_netOutput];
+            break;
+        case KRDeltaActiveFunctionBySigmoid:
+            _activatedValue = [self _fOfSigmoid:_netOutput];
+            break;
+        default:
+            _activatedValue = [self _fOfSgn:_netOutput];
+            break;
+    }
+    return _activatedValue;
+}
+
 -(double)_fOfNetWithInputs:(NSArray *)_inputs
 {
     double _sum      = 0.0f;
@@ -86,21 +104,7 @@
         _sum += [_xValue floatValue] * [[self.weights objectAtIndex:_index] floatValue];
         ++_index;
     }
-    
-    double _activatedValue = 0.0f;
-    switch (self.activeFunction)
-    {
-        case KRDeltaActiveFunctionByTanh:
-            _activatedValue = [self _fOfTanh:_sum];
-            break;
-        case KRDeltaActiveFunctionBySigmoid:
-            _activatedValue = [self _fOfSigmoid:_sum];
-            break;
-        default:
-            _activatedValue = [self _fOfSgn:_sum];
-            break;
-    }
-    return _activatedValue;
+    return [self _activateOutputValue:_sum];
 }
 
 // f'(net) method in different active functions
@@ -147,7 +151,7 @@
     double _dashOutput     = [self _fDashOfNet:_netOutput];
     
     // new weights = learning rate * (target value - net output) * f'(net) * x1 + w1
-    double _sigmaValue     = _learningRate * (_targetValue - _netOutput) * _dashOutput;
+    double _sigmaValue     = _learningRate * _errorValue * _dashOutput;
     NSArray *_deltaWeights = [self _multiplyMatrix:_inputs byNumber:_sigmaValue];
     NSArray *_newWeights   = [self _plusMatrix:_weights anotherMatrix:_deltaWeights];
     
