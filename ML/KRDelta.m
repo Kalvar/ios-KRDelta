@@ -60,6 +60,7 @@
 @implementation KRDelta (fixDelta)
 
 // Tanh() which scope is [-1.0, 1.0]
+// Formula is " ( 2.0 / (1.0 + e^(-入 * x)) ) - 1.0 ", the 入 default is 1.0, 越大越平滑
 -(double)_fOfTanh:(float)_x
 {
     return ( 2.0f / ( 1.0f + pow(M_E, (-1.0f * _x)) ) ) - 1.0f;
@@ -115,7 +116,7 @@
     {
         case KRDeltaActiveFunctionByTanh:
             // The original formula : (1 - y^2) * 入 / 2
-            // Derivative = (1 - y) * (1 + y) = (1 - y^2)
+            // Derivative  = (1 - y) * (1 + y) = (1 - y^2)
             //_dashedValue = ( 1.0f - _outputValue ) * ( 1.0f * _outputValue );
             // Optimized derivative method since this methods used tahn() that 入 is 1.0 not standard 2.0
             _dashedValue = ( 1.0f - ( _outputValue * _outputValue ) ) * 0.5f;
