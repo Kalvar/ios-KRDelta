@@ -59,20 +59,20 @@
 
 @implementation KRDelta (fixDelta)
 
-// Tanh() which scope is [-1.0, 1.0]
-// Formula is " ( 2.0 / (1.0 + e^(-入 * x)) ) - 1.0 ", the 入 default is 1.0, 越大越平滑
+// Tanh() named Hyperbolic Tangent which is scope in [-1.0, 1.0]
+// Formula is " ( 2.0 / (1.0 + e^(-入 * x)) ) - 1.0 ", the 入 default is 1.0, 越小越平滑
 -(double)_fOfTanh:(float)_x
 {
     return ( 2.0f / ( 1.0f + pow(M_E, (-1.0f * _x)) ) ) - 1.0f;
 }
 
-// Sigmoid() whici scope is [0.0, 1.0]
+// Sigmoid() which is scope in [0.0, 1.0]
 -(double)_fOfSigmoid:(float)_x
 {
     return ( 1.0f / ( 1.0f + pow(M_E, (-1.0f * _x)) ) );
 }
 
-// SGN() which scope is (-1, 1) or (0, 1)
+// SGN() named Sign Function which is scope in (-1, 1) or (0, 1)
 -(float)_fOfSgn:(double)_sgnValue
 {
     return ( _sgnValue >= 0.0f ) ? 1.0f : -1.0f;

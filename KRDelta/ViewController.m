@@ -20,7 +20,7 @@
     
     KRDelta *_delta         = [KRDelta sharedDelta];
     _delta.activeFunction   = KRDeltaActiveFunctionByTanh;
-    _delta.learningRate     = 0.8f;
+    _delta.learningRate     = 1.0f;
     _delta.convergenceValue = 0.001f;
     _delta.maxIteration     = 1000;
     [_delta addPatterns:@[@1.0f, @-2.0f, @0.0f, @-1.0f] target:-1.0f];
