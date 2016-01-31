@@ -19,7 +19,7 @@
     [super viewDidLoad];
     
     KRDelta *_delta         = [KRDelta sharedDelta];
-    _delta.activeFunction   = KRDeltaActiveFunctionByTanh;
+    _delta.activeFunction   = KRDeltaActiveFunctionTanh;
     _delta.learningRate     = 1.0f;
     _delta.convergenceValue = 0.001f;
     _delta.maxIteration     = 1000;

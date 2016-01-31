@@ -10,9 +10,10 @@
 
 typedef enum KRDeltaActiveFunctions
 {
-    KRDeltaActiveFunctionBySgn  = 0, // Sign Function 符號函數
-    KRDeltaActiveFunctionByTanh,     // Hyperbolic Tangent 雙曲正切函數
-    KRDeltaActiveFunctionBySigmoid   // Sigmoid S形函數
+    KRDeltaActiveFunctionSgn  = 0, // Sign Function 符號函數
+    KRDeltaActiveFunctionTanh,     // Hyperbolic Tangent 雙曲正切函數
+    KRDeltaActiveFunctionSigmoid,  // Sigmoid S形函數
+    KRDeltaActiveFunctionRBF       // RBF 高斯函數
 }KRDeltaActiveFunctions;
 
 typedef void(^KRDeltaCompletion)(BOOL success, NSArray *weights, NSInteger totalIteration);

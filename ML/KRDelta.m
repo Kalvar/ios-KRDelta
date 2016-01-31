@@ -78,16 +78,26 @@
     return ( _sgnValue >= 0.0f ) ? 1.0f : -1.0f;
 }
 
+// RBF() is Gussian Function
+-(double)_fOfRBF:(double)_sum sigma:(float)_sigma
+{
+    // Formula : exp^( -s / ( 2.0f * sigma * sigma ) )
+    return pow(M_E, ((-_sum) / ( 2.0f * _sigma * _sigma )));
+}
+
 -(double)_activateOutputValue:(double)_netOutput
 {
     double _activatedValue = 0.0f;
     switch (self.activeFunction)
     {
-        case KRDeltaActiveFunctionByTanh:
+        case KRDeltaActiveFunctionTanh:
             _activatedValue = [self _fOfTanh:_netOutput];
             break;
-        case KRDeltaActiveFunctionBySigmoid:
+        case KRDeltaActiveFunctionSigmoid:
             _activatedValue = [self _fOfSigmoid:_netOutput];
+            break;
+        case KRDeltaActiveFunctionRBF:
+            _activatedValue = [self _fOfRBF:_netOutput sigma:2.0f];
             break;
         default:
             _activatedValue = [self _fOfSgn:_netOutput];
@@ -114,17 +124,19 @@
     double _dashedValue = 0.0f;
     switch (self.activeFunction)
     {
-        case KRDeltaActiveFunctionByTanh:
+        case KRDeltaActiveFunctionTanh:
             // The original formula : (1 - y^2) * 入 / 2
             // Derivative  = (1 - y) * (1 + y) = (1 - y^2)
             //_dashedValue = ( 1.0f - _outputValue ) * ( 1.0f * _outputValue );
             // Optimized derivative method since this methods used tahn() that 入 is 1.0 not standard 2.0
             _dashedValue = ( 1.0f - ( _outputValue * _outputValue ) ) * 0.5f;
             break;
-        case KRDeltaActiveFunctionBySigmoid:
+        case KRDeltaActiveFunctionSigmoid:
             // Derivative = (1 - y) * y
             _dashedValue = ( 1.0f - _outputValue ) * _outputValue;
             break;
+        case KRDeltaActiveFunctionRBF:
+        case KRDeltaActiveFunctionSgn:
         default:
             _dashedValue = _outputValue;
             break;
@@ -192,7 +204,7 @@
         _maxIteration     = 1;
         _convergenceValue = 0.0f;
         
-        _activeFunction   = KRDeltaActiveFunctionByTanh;
+        _activeFunction   = KRDeltaActiveFunctionTanh;
     }
     return self;
 }
