@@ -146,7 +146,7 @@
 
 -(double)_calculateIterationError
 {
-    // MSE
+    // Delta method defined formula of cost function
     return (self.sumError / [self.patterns count]) * 0.5f;
 }
 
