@@ -13,6 +13,7 @@ typedef enum KRDeltaActiveFunctions
     KRDeltaActiveFunctionSgn  = 0, // Sign Function 符號函數
     KRDeltaActiveFunctionTanh,     // Hyperbolic Tangent 雙曲正切函數
     KRDeltaActiveFunctionSigmoid,  // Sigmoid S形函數
+    // TODO : Need to implement
     KRDeltaActiveFunctionRBF       // RBF 高斯函數
 }KRDeltaActiveFunctions;
 
@@ -39,6 +40,7 @@ typedef void(^KRDeltaDirectOutput)(NSArray *outputs);
 
 -(void)addPatterns:(NSArray *)_inputs target:(double)_targetValue;
 -(void)setupWeights:(NSArray *)_initWeights;
+-(void)setupRandomMin:(float)_min max(float)_max;
 -(void)randomWeights;
 
 -(void)training;
