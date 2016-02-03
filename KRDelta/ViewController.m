@@ -26,6 +26,7 @@
     [_delta addPatterns:@[@1.0f, @-2.0f, @0.0f, @-1.0f] target:-1.0f];
     [_delta addPatterns:@[@0.0f, @1.5f, @-0.5f, @-1.0f] target:1.0f];
     [_delta setupWeights:@[@1.0f, @-1.0f, @0.0f, @0.5f]];
+    //[_delta setupRandomMin:-0.5f max:0.5f];
     //[_delta randomWeights];
     [_delta trainingWithIteration:^(NSInteger iteration, NSArray *weights) {
         NSLog(@"Doing %li iteration : %@", iteration, weights);
