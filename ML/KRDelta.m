@@ -8,9 +8,6 @@
 
 #import "KRDelta.h"
 
-#define DEFAULT_RANDOM_MAX 0.5f
-#define DEFAULT_RANDOM_MIN -0.5f
-
 @interface KRDelta ()
 
 @property (nonatomic, assign) NSInteger iteration;
