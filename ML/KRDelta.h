@@ -40,7 +40,7 @@ typedef void(^KRDeltaDirectOutput)(NSArray *outputs);
 
 -(void)addPatterns:(NSArray *)_inputs target:(double)_targetValue;
 -(void)setupWeights:(NSArray *)_initWeights;
--(void)setupRandomMin:(float)_min max(float)_max;
+-(void)setupRandomMin:(float)_min max:(float)_max;
 -(void)randomWeights;
 
 -(void)training;
