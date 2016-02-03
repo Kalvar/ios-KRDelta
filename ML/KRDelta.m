@@ -199,6 +199,7 @@
         _iteration        = 0;
         _sumError         = 0.0f;
         _randomScopes     = [NSMutableArray new];
+        [self setupRandomMin:-0.5f max:0.5f];
         
         _maxIteration     = 1;
         _convergenceValue = 0.0f;
@@ -224,7 +225,7 @@
     [_weights addObjectsFromArray:_initWeights];
 }
 
--(void)setupRandomMin:(float)_min max(float)_max
+-(void)setupRandomMin:(float)_min max:(float)_max
 {
     [_randomScopes removeAllObjects];
     [_randomScopes addObject:[NSNumber numberWithFloat:_min]];
