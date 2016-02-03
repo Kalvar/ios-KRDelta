@@ -15,6 +15,7 @@
 
 @property (nonatomic, assign) NSInteger iteration;
 @property (nonatomic, assign) double sumError; // Iteration errors
+@property (nonatomic, strong) NSMutableArray *randomScopes;
 
 @end
 
@@ -200,6 +201,7 @@
         
         _iteration        = 0;
         _sumError         = 0.0f;
+        _randomScopes     = [NSMutableArray new];
         
         _maxIteration     = 1;
         _convergenceValue = 0.0f;
@@ -225,13 +227,20 @@
     [_weights addObjectsFromArray:_initWeights];
 }
 
+-(void)setupRandomMin:(float)_min max(float)_max
+{
+    [_randomScopes removeAllObjects];
+    [_randomScopes addObject:[NSNumber numberWithFloat:_min]];
+    [_randomScopes addObject:[NSNumber numberWithFloat:_max]];
+}
+
 -(void)randomWeights
 {
     // Follows the inputs count to decide how many weights it needs.
     [_weights removeAllObjects];
     NSInteger _inputNetCount = [[_patterns firstObject] count];
-    double _inputMax         = DEFAULT_RANDOM_MAX / _inputNetCount;
-    double _inputMin         = DEFAULT_RANDOM_MIN / _inputNetCount;
+    double _inputMax         = [[_randomScopes lastObject] floatValue] / _inputNetCount;
+    double _inputMin         = [[_randomScopes firstObject] floatValue] / _inputNetCount;
     for( int i=0; i<_inputNetCount; i++ )
     {
         [_weights addObject:[NSNumber numberWithDouble:[self _randomMax:_inputMax min:_inputMin]]];
