@@ -29,6 +29,7 @@ typedef void(^KRDeltaDirectOutput)(NSArray *outputs);
 @property (nonatomic, assign) float learningRate;
 @property (nonatomic, assign) NSInteger maxIteration;
 @property (nonatomic, assign) float convergenceValue;
+@property (nonatomic, assign) double sigma;
 
 @property (nonatomic, assign) KRDeltaActiveFunctions activeFunction;
 

@@ -95,7 +95,7 @@
             _activatedValue = [self _fOfSigmoid:_netOutput];
             break;
         case KRDeltaActiveFunctionRBF:
-            _activatedValue = [self _fOfRBF:_netOutput sigma:2.0f];
+            _activatedValue = [self _fOfRBF:_netOutput sigma:self.sigma];
             break;
         default:
             _activatedValue = [self _fOfSgn:_netOutput];
@@ -134,6 +134,8 @@
             _dashedValue = ( 1.0f - _outputValue ) * _outputValue;
             break;
         case KRDeltaActiveFunctionRBF:
+            _dashedValue = -((2.0 * _outputValue) / (2.0 * self.sigma * self.sigma)) * pow(M_E, (-_outputValue) / (2.0 * self.sigma * self.sigma));
+            break;
         case KRDeltaActiveFunctionSgn:
         default:
             _dashedValue = _outputValue;
@@ -203,6 +205,7 @@
         
         _maxIteration     = 1;
         _convergenceValue = 0.0f;
+        _sigma            = 2.0f;
         
         _activeFunction   = KRDeltaActiveFunctionTanh;
     }
