@@ -5,8 +5,8 @@ KRDelta (it just a neuron) implemented by Delta Learning Method of Machine Learn
 #### Podfile
 
 ```ruby
-platform :ios, '7.0'
-pod "KRDelta", "~> 1.2.0"
+platform :ios, '8.0'
+pod 'KRDelta'
 ```
 
 ## How To Get Started
