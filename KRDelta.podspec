@@ -1,9 +1,9 @@
 Pod::Spec.new do |s|
   s.name         = "KRDelta"
-  s.version      = "1.1.0"
-  s.summary      = "KRDelta is implemented by Delta Learning Method in Machine Learning that is also a supervisor and used gradient method to find out the best solution."
+  s.version      = "1.2.0"
+  s.summary      = "KRDelta implemented by Delta Learning Method of Machine Learning that is a supervisor and gradient method."
   s.description  = <<-DESC
-                   Flexible using this method with neural network and classification methods could combine together.
+                   This classic algorithm could do micro-analysis on mobile as well, we proved its benefit on our mobile businesses.
                    DESC
   s.homepage     = "https://github.com/Kalvar/ios-KRDelta"
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/Kalvar/ios-KRDelta.git", :tag => s.version.to_s }
   s.platform     = :ios, '7.0'
   s.requires_arc = true
-  s.public_header_files = 'ML/*.h'
-  s.source_files = 'ML/*.{h,m}'
+  s.public_header_files = 'ML/**/*.h'
+  s.source_files = 'ML/**/*.{h,m}'
   s.frameworks   = 'Foundation'
 end 

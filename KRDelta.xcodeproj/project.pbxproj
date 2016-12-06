@@ -13,7 +13,10 @@
 		8E24E5651BE913D20092A2BD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8E24E5631BE913D20092A2BD /* Main.storyboard */; };
 		8E24E5671BE913D20092A2BD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E24E5661BE913D20092A2BD /* Assets.xcassets */; };
 		8E24E56A1BE913D20092A2BD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8E24E5681BE913D20092A2BD /* LaunchScreen.storyboard */; };
-		8E24E5741BE914030092A2BD /* KRDelta.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E24E5731BE914030092A2BD /* KRDelta.m */; settings = {ASSET_TAGS = (); }; };
+		8E24E5741BE914030092A2BD /* KRDelta.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E24E5731BE914030092A2BD /* KRDelta.m */; };
+		B891ACCE1DF68B3E0094BB64 /* KRDeltaActivation.m in Sources */ = {isa = PBXBuildFile; fileRef = B891ACCD1DF68B3E0094BB64 /* KRDeltaActivation.m */; };
+		B891ACD21DF6929E0094BB64 /* KRDeltaMath.m in Sources */ = {isa = PBXBuildFile; fileRef = B891ACD11DF6929E0094BB64 /* KRDeltaMath.m */; };
+		B891ACD71DF697850094BB64 /* KRDeltaFetcher.m in Sources */ = {isa = PBXBuildFile; fileRef = B891ACD61DF697850094BB64 /* KRDeltaFetcher.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +32,12 @@
 		8E24E56B1BE913D20092A2BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8E24E5721BE914030092A2BD /* KRDelta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KRDelta.h; sourceTree = "<group>"; };
 		8E24E5731BE914030092A2BD /* KRDelta.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KRDelta.m; sourceTree = "<group>"; };
+		B891ACCC1DF68B3E0094BB64 /* KRDeltaActivation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KRDeltaActivation.h; sourceTree = "<group>"; };
+		B891ACCD1DF68B3E0094BB64 /* KRDeltaActivation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KRDeltaActivation.m; sourceTree = "<group>"; };
+		B891ACD01DF6929E0094BB64 /* KRDeltaMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KRDeltaMath.h; sourceTree = "<group>"; };
+		B891ACD11DF6929E0094BB64 /* KRDeltaMath.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KRDeltaMath.m; sourceTree = "<group>"; };
+		B891ACD51DF697850094BB64 /* KRDeltaFetcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KRDeltaFetcher.h; sourceTree = "<group>"; };
+		B891ACD61DF697850094BB64 /* KRDeltaFetcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KRDeltaFetcher.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,10 +95,40 @@
 		8E24E5711BE914030092A2BD /* ML */ = {
 			isa = PBXGroup;
 			children = (
+				B891ACD41DF697220094BB64 /* Fetcher */,
+				B891ACCF1DF692890094BB64 /* Math */,
+				B891ACCB1DF68B3E0094BB64 /* Activations */,
 				8E24E5721BE914030092A2BD /* KRDelta.h */,
 				8E24E5731BE914030092A2BD /* KRDelta.m */,
 			);
 			path = ML;
+			sourceTree = "<group>";
+		};
+		B891ACCB1DF68B3E0094BB64 /* Activations */ = {
+			isa = PBXGroup;
+			children = (
+				B891ACCC1DF68B3E0094BB64 /* KRDeltaActivation.h */,
+				B891ACCD1DF68B3E0094BB64 /* KRDeltaActivation.m */,
+			);
+			path = Activations;
+			sourceTree = "<group>";
+		};
+		B891ACCF1DF692890094BB64 /* Math */ = {
+			isa = PBXGroup;
+			children = (
+				B891ACD01DF6929E0094BB64 /* KRDeltaMath.h */,
+				B891ACD11DF6929E0094BB64 /* KRDeltaMath.m */,
+			);
+			path = Math;
+			sourceTree = "<group>";
+		};
+		B891ACD41DF697220094BB64 /* Fetcher */ = {
+			isa = PBXGroup;
+			children = (
+				B891ACD51DF697850094BB64 /* KRDeltaFetcher.h */,
+				B891ACD61DF697850094BB64 /* KRDeltaFetcher.m */,
+			);
+			path = Fetcher;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -162,6 +201,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B891ACCE1DF68B3E0094BB64 /* KRDeltaActivation.m in Sources */,
+				B891ACD21DF6929E0094BB64 /* KRDeltaMath.m in Sources */,
+				B891ACD71DF697850094BB64 /* KRDeltaFetcher.m in Sources */,
 				8E24E5621BE913D20092A2BD /* ViewController.m in Sources */,
 				8E24E55F1BE913D20092A2BD /* AppDelegate.m in Sources */,
 				8E24E55C1BE913D20092A2BD /* main.m in Sources */,
@@ -314,6 +356,7 @@
 				8E24E5701BE913D20092A2BD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

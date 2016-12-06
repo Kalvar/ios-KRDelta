@@ -9,6 +9,7 @@
 #import "ViewController.h"
 #import "KRDelta.h"
 
+
 @interface ViewController ()
 
 @end
@@ -18,21 +19,24 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    KRDelta *_delta         = [KRDelta sharedDelta];
-    _delta.activeFunction   = KRDeltaActiveFunctionTanh;
-    _delta.learningRate     = 0.8f;
-    _delta.convergenceValue = 0.001f;
-    _delta.maxIteration     = 1000;
-    [_delta addPatterns:@[@1.0f, @-2.0f, @0.0f, @-1.0f] target:-1.0f];
-    [_delta addPatterns:@[@0.0f, @1.5f, @-0.5f, @-1.0f] target:1.0f];
-    [_delta setupWeights:@[@1.0f, @-1.0f, @0.0f, @0.5f]];
-    //[_delta setupRandomMin:-0.5f max:0.5f];
-    //[_delta randomWeights];
-    [_delta trainingWithIteration:^(NSInteger iteration, NSArray *weights) {
+    KRDelta *delta         = [KRDelta sharedDelta];
+    delta.activeFunction   = KRDeltaActiveFunctionTanh;
+    delta.learningRate     = 0.8f;
+    delta.convergenceValue = 0.001f;
+    delta.maxIteration     = 1000;
+    [delta addPatterns:@[@1.0f, @-2.0f, @0.0f, @-1.0f] target:-1.0f];
+    [delta addPatterns:@[@0.0f, @1.5f, @-0.5f, @-1.0f] target:1.0f];
+    
+    [delta setupWeights:@[@1.0f, @-1.0f, @0.0f, @0.5f]];
+    //[delta setupRandomMin:-0.5f max:0.5f];
+    //[delta randomWeights];
+    
+    [delta trainingWithIteration:^(NSInteger iteration, NSArray *weights) {
         NSLog(@"Doing %li iteration : %@", iteration, weights);
     } completion:^(BOOL success, NSArray *weights, NSInteger totalIteration) {
         NSLog(@"Done %li iteration : %@", totalIteration, weights);
-        [_delta directOutputByPatterns:@[@1.0f, @-2.0f, @0.0f, @-1.0f] completion:^(NSArray *outputs) {
+        //[[KRDeltaFetcher sharedFetcher] save:delta forKey:@"A1"];
+        [delta directOutputByPatterns:@[@1.0f, @-2.0f, @0.0f, @-1.0f] completion:^(NSArray *outputs) {
             NSLog(@"Direct Output : %@", outputs);
         }];
     }];

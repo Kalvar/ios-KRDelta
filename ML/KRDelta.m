@@ -7,104 +7,61 @@
 //
 
 #import "KRDelta.h"
+#import "KRDeltaActivation.h"
+#import "KRDeltaMath.h"
 
 @interface KRDelta ()
 
+@property (nonatomic, strong) KRDeltaActivation *activation;
+@property (nonatomic, strong) KRDeltaMath *math;
 @property (nonatomic, assign) NSInteger iteration;
 @property (nonatomic, assign) double sumError; // Iteration errors
 @property (nonatomic, strong) NSMutableArray *randomScopes;
+@property (nonatomic, weak) NSCoder *coder;
 
 @end
 
-@implementation KRDelta (fixMatrix)
+@implementation KRDelta (NSCoding)
 
-// ex : 0.5f * [1, 2]
--(NSArray *)_multiplyMatrix:(NSArray *)_matrix byNumber:(double)_number
+- (void)encodeObject:(id)object forKey:(NSString *)key
 {
-    NSMutableArray *_array = [NSMutableArray new];
-    for( NSNumber *_value in _matrix )
+    if( nil != object )
     {
-        double _newValue = _number * [_value doubleValue];
-        [_array addObject:[NSNumber numberWithDouble:_newValue]];
+        [self.coder encodeObject:object forKey:key];
     }
-    return _array;
 }
 
-// ex : [1, 2] + [3, 4]
--(NSArray *)_plusMatrix:(NSArray *)_matrix anotherMatrix:(NSArray *)_anotherMatrix
+- (id)decodeForKey:(NSString *)key
 {
-    NSMutableArray *_array = [NSMutableArray new];
-    NSInteger _index       = 0;
-    for( NSNumber *_value in _matrix )
-    {
-        double _newValue = [_value doubleValue] + [[_anotherMatrix objectAtIndex:_index] doubleValue];
-        [_array addObject:[NSNumber numberWithDouble:_newValue]];
-        ++_index;
-    }
-    return _array;
-}
-
-@end
-
-@implementation KRDelta (fixMaths)
-
--(double)_randomMax:(double)_maxValue min:(double)_minValue
-{
-    return ((double)arc4random() / ( RAND_MAX * 2.0f ) ) * (_maxValue - _minValue) + _minValue;
+    return [self.coder decodeObjectForKey:key];
 }
 
 @end
 
 @implementation KRDelta (fixDelta)
 
-// Tanh() named Hyperbolic Tangent which is scope in [-1.0, 1.0]
-// Formula is " ( 2.0 / (1.0 + e^(-入 * x)) ) - 1.0 ", the 入 default is 1.0, 越小越平滑
--(double)_fOfTanh:(float)_x
-{
-    return ( 2.0f / ( 1.0f + pow(M_E, (-1.0f * _x)) ) ) - 1.0f;
-}
-
-// Sigmoid() which is scope in [0.0, 1.0]
--(double)_fOfSigmoid:(float)_x
-{
-    return ( 1.0f / ( 1.0f + pow(M_E, (-1.0f * _x)) ) );
-}
-
-// SGN() named Sign Function which is scope in (-1, 1) or (0, 1)
--(float)_fOfSgn:(double)_sgnValue
-{
-    return ( _sgnValue >= 0.0f ) ? 1.0f : -1.0f;
-}
-
-// RBF() is Gussian Function
--(double)_fOfRBF:(double)_sum sigma:(float)_sigma
-{
-    // Formula : exp^( -s / ( 2.0f * sigma * sigma ) )
-    return pow(M_E, ((-_sum) / ( 2.0f * _sigma * _sigma )));
-}
-
--(double)_activateOutputValue:(double)_netOutput
+- (double)_activateOutputValue:(double)_netOutput
 {
     double _activatedValue = 0.0f;
     switch (self.activeFunction)
     {
         case KRDeltaActiveFunctionTanh:
-            _activatedValue = [self _fOfTanh:_netOutput];
+            _activatedValue = [self.activation tanh:_netOutput slope:1.0f];
             break;
         case KRDeltaActiveFunctionSigmoid:
-            _activatedValue = [self _fOfSigmoid:_netOutput];
+            _activatedValue = [self.activation sigmoid:_netOutput slope:1.0f];
             break;
         case KRDeltaActiveFunctionRBF:
-            _activatedValue = [self _fOfRBF:_netOutput sigma:self.sigma];
+            _activatedValue = [self.activation rbf:_netOutput sigma:self.sigma];
             break;
         default:
-            _activatedValue = [self _fOfSgn:_netOutput];
+            _activatedValue = [self.activation sgn:_netOutput];
             break;
     }
     return _activatedValue;
 }
 
--(double)_fOfNetWithInputs:(NSArray *)_inputs
+- (double)_fOfNetWithInputs:(NSArray *)_inputs
 {
     double _sum      = 0.0f;
     NSInteger _index = 0;
@@ -117,45 +74,40 @@
 }
 
 // f'(net) method in different active functions
--(double)_fDashOfNet:(double)_outputValue
+- (double)_fDashOfNet:(double)_outputValue
 {
     double _dashedValue = 0.0f;
     switch (self.activeFunction)
     {
         case KRDeltaActiveFunctionTanh:
-            // The original formula : (1 - y^2) * 入 / 2
-            // Derivative  = (1 - y) * (1 + y) = (1 - y^2)
-            //_dashedValue = ( 1.0f - _outputValue ) * ( 1.0f * _outputValue );
-            // Optimized derivative method since this methods used tahn() that 入 is 1.0 not standard 2.0
-            _dashedValue = ( 1.0f - ( _outputValue * _outputValue ) ) * 0.5f;
+            _dashedValue = [self.activation partialTanh:_outputValue slope:1.0f];
             break;
         case KRDeltaActiveFunctionSigmoid:
-            // Derivative = (1 - y) * y
-            _dashedValue = ( 1.0f - _outputValue ) * _outputValue;
+            _dashedValue = [self.activation partialSigmoid:_outputValue slope:1.0f];
             break;
         case KRDeltaActiveFunctionRBF:
-            _dashedValue = -((2.0 * _outputValue) / (2.0 * self.sigma * self.sigma)) * pow(M_E, (-_outputValue) / (2.0 * self.sigma * self.sigma));
+            _dashedValue = [self.activation partialRBF:_outputValue sigma:self.sigma];
             break;
         case KRDeltaActiveFunctionSgn:
         default:
-            _dashedValue = _outputValue;
+            _dashedValue = [self.activation partialSgn:_outputValue];
             break;
     }
     return _dashedValue;
 }
 
--(double)_calculateIterationError
+- (double)_calculateIterationError
 {
     // Delta method defined formula of cost function
     return (self.sumError / [self.patterns count]) * 0.5f;
 }
 
--(void)_sumError:(double)_errorValue
+- (void)_sumError:(double)_errorValue
 {
     self.sumError += ( _errorValue * _errorValue );
 }
 
--(void)_turningWeightsByInputs:(NSArray *)_inputs targetValue:(double)_targetValue
+- (void)_turningWeightsByInputs:(NSArray *)_inputs targetValue:(double)_targetValue
 {
     NSArray *_weights      = self.weights;
     float _learningRate    = self.learningRate;
@@ -165,8 +117,8 @@
     
     // new weights = learning rate * (target value - net output) * f'(net) * x1 + w1
     double _sigmaValue     = _learningRate * _errorValue * _dashOutput;
-    NSArray *_deltaWeights = [self _multiplyMatrix:_inputs byNumber:_sigmaValue];
-    NSArray *_newWeights   = [self _plusMatrix:_weights anotherMatrix:_deltaWeights];
+    NSArray *_deltaWeights = [self.math multiplyMatrix:_inputs byNumber:_sigmaValue];
+    NSArray *_newWeights   = [self.math plusMatrix:_weights anotherMatrix:_deltaWeights];
     
     [self.weights removeAllObjects];
     [self.weights addObjectsFromArray:_newWeights];
@@ -178,7 +130,7 @@
 
 @implementation KRDelta
 
-+(instancetype)sharedDelta
++ (instancetype)sharedDelta
 {
     static dispatch_once_t pred;
     static KRDelta *_object = nil;
@@ -188,7 +140,7 @@
     return _object;
 }
 
--(instancetype)init
+- (instancetype)init
 {
     self = [super init];
     if( self )
@@ -208,18 +160,20 @@
         _sigma            = 2.0f;
         
         _activeFunction   = KRDeltaActiveFunctionTanh;
+        _activation       = [[KRDeltaActivation alloc] init];
+        _math             = [[KRDeltaMath alloc] init];
     }
     return self;
 }
 
 #pragma --mark Public Methods
--(void)addPatterns:(NSArray *)_inputs target:(double)_targetValue
+- (void)addPatterns:(NSArray *)_inputs target:(double)_targetValue
 {
     [_patterns addObject:_inputs];
     [_targets addObject:[NSNumber numberWithDouble:_targetValue]];
 }
 
--(void)setupWeights:(NSArray *)_initWeights
+- (void)setupWeights:(NSArray *)_initWeights
 {
     if( [_weights count] > 0 )
     {
@@ -228,14 +182,14 @@
     [_weights addObjectsFromArray:_initWeights];
 }
 
--(void)setupRandomMin:(float)_min max:(float)_max
+- (void)setupRandomMin:(float)_min max:(float)_max
 {
     [_randomScopes removeAllObjects];
     [_randomScopes addObject:[NSNumber numberWithFloat:_min]];
     [_randomScopes addObject:[NSNumber numberWithFloat:_max]];
 }
 
--(void)randomWeights
+- (void)randomWeights
 {
     // Follows the inputs count to decide how many weights it needs.
     [_weights removeAllObjects];
@@ -244,11 +198,11 @@
     double _inputMin         = [[_randomScopes firstObject] floatValue] / _inputNetCount;
     for( int i=0; i<_inputNetCount; i++ )
     {
-        [_weights addObject:[NSNumber numberWithDouble:[self _randomMax:_inputMax min:_inputMin]]];
+        [_weights addObject:[NSNumber numberWithDouble:[_math randomMax:_inputMax min:_inputMin]]];
     }
 }
 
--(void)training
+- (void)training
 {
     ++_iteration;
     _sumError               = 0.0f;
@@ -277,19 +231,19 @@
     }
 }
 
--(void)trainingWithCompletion:(KRDeltaCompletion)_completionBlock
+- (void)trainingWithCompletion:(KRDeltaCompletion)_completionBlock
 {
     _trainingCompletion = _completionBlock;
     [self training];
 }
 
--(void)trainingWithIteration:(KRDeltaIteration)_iterationBlock completion:(KRDeltaCompletion)_completionBlock
+- (void)trainingWithIteration:(KRDeltaIteration)_iterationBlock completion:(KRDeltaCompletion)_completionBlock
 {
     _trainingIteraion = _iterationBlock;
     [self trainingWithCompletion:_completionBlock];
 }
 
--(void)directOutputByPatterns:(NSArray *)_inputs completion:(KRDeltaDirectOutput)_completionBlock
+- (void)directOutputByPatterns:(NSArray *)_inputs completion:(KRDeltaDirectOutput)_completionBlock
 {
     double _netOutput = [self _fOfNetWithInputs:_inputs];
     if( nil != _completionBlock )
@@ -299,14 +253,38 @@
 }
 
 #pragma --mark Block Setters
--(void)setTrainingCompletion:(KRDeltaCompletion)_block
+- (void)setTrainingCompletion:(KRDeltaCompletion)_block
 {
     _trainingCompletion = _block;
 }
 
--(void)setTrainingIteraion:(KRDeltaIteration)_block
+- (void)setTrainingIteraion:(KRDeltaIteration)_block
 {
     _trainingIteraion = _block;
+}
+
+#pragma --mark NSCoding
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+    self.coder = aCoder;
+    [self encodeObject:@(_learningRate) forKey:@"learningRate"];
+    [self encodeObject:_weights forKey:@"weights"];
+    [self encodeObject:@(_sigma) forKey:@"sigma"];
+    [self encodeObject:@(_activeFunction) forKey:@"activeFunction"];
+}
+
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [self init];
+    if(self)
+    {
+        self.coder      = aDecoder;
+        _learningRate   = [[self decodeForKey:@"learningRate"] floatValue];
+        _weights        = [self decodeForKey:@"weights"];
+        _sigma          = [[self decodeForKey:@"sigma"] floatValue];
+        _activeFunction = [[self decodeForKey:@"activeFunction"] integerValue];
+    }
+    return self;
 }
 
 @end
