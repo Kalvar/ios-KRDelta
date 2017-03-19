@@ -1,12 +1,12 @@
 ## About
 
-KRDelta (it just a neuron) implemented by Delta Learning Method of Machine Learning that is a supervisor and gradient method. This classic algorithm could do micro-analysis on mobile as well.
+KRDelta is an supervised learning by Delta Learning method of machine learning, this classic algorithm can do micro-analysis on mobile as well.
 
 #### Podfile
 
 ```ruby
 platform :ios, '8.0'
-pod 'KRDelta', '~> 1.2.0'
+pod 'KRDelta', '~> 1.3.0'
 ```
 
 ## How To Get Started
@@ -19,10 +19,10 @@ pod 'KRDelta', '~> 1.2.0'
 #### Normal Case
 ``` objective-c
 KRDelta *delta         = [KRDelta sharedDelta];
-delta.activeFunction   = KRDeltaActiveFunctionTanh;
+delta.activeFunction   = KRDeltaActivationTanh;
 delta.learningRate     = 0.8f;
 delta.convergenceValue = 0.001f;
-delta.maxIteration     = 1000;
+delta.maxIteration     = 100;
 [delta addPatterns:@[@1.0f, @-2.0f, @0.0f, @-1.0f] target:-1.0f];
 [delta addPatterns:@[@0.0f, @1.5f, @-0.5f, @-1.0f] target:1.0f];
 [delta setupRandomMin:-0.5f max:0.5f];
@@ -52,7 +52,7 @@ KRDelta *trainedDelta = [[KRDeltaFetcher sharedFetcher] objectForKey:@"A1"];
 
 ## Version
 
-V1.2.0
+V1.3.0
 
 ## LICENSE
 

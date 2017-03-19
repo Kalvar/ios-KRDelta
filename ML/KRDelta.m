@@ -40,90 +40,128 @@
 
 @implementation KRDelta (fixDelta)
 
-- (double)_activateOutputValue:(double)_netOutput
+- (double)activate:(double)netInput
 {
-    double _activatedValue = 0.0f;
+    double _activatedValue = netInput;
     switch (self.activeFunction)
     {
-        case KRDeltaActiveFunctionTanh:
-            _activatedValue = [self.activation tanh:_netOutput slope:1.0f];
+        case KRDeltaActivationTanh:
+            _activatedValue = [self.activation tanh:netInput slope:2.0f];
             break;
-        case KRDeltaActiveFunctionSigmoid:
-            _activatedValue = [self.activation sigmoid:_netOutput slope:1.0f];
+        case KRDeltaActivationSigmoid:
+            _activatedValue = [self.activation sigmoid:netInput slope:1.0f];
             break;
-        case KRDeltaActiveFunctionRBF:
-            _activatedValue = [self.activation rbf:_netOutput sigma:self.sigma];
+        case KRDeltaActivationRBF:
+            _activatedValue = [self.activation rbf:netInput sigma:self.sigma];
+            break;
+        case KRDeltaActivationSGN:
+            _activatedValue = [self.activation sgn:netInput];
+            break;
+        case KRDeltaActivationReLU:
+            _activatedValue = [self.activation reLU:netInput];
+            break;
+        case KRDeltaActivationELU:
+            _activatedValue = [self.activation eLU:netInput];
+            break;
+        case KRDeltaActivationLeakyReLU:
+            _activatedValue = [self.activation leakyReLU:netInput];
             break;
         default:
-            _activatedValue = [self.activation sgn:_netOutput];
             break;
     }
     return _activatedValue;
 }
 
-- (double)_fOfNetWithInputs:(NSArray *)_inputs
+- (double)sumNetInput:(NSArray *)inputs
 {
-    double _sum      = 0.0f;
-    NSInteger _index = 0;
-    for( NSNumber *_xValue in _inputs )
+    double _sumSingal = 0.0f;
+    NSInteger _index  = 0;
+    for( NSNumber *_xValue in inputs )
     {
-        _sum += [_xValue floatValue] * [[self.weights objectAtIndex:_index] floatValue];
+        _sumSingal += [_xValue floatValue] * [[self.weights objectAtIndex:_index] doubleValue];
         ++_index;
     }
-    return [self _activateOutputValue:_sum];
+    return _sumSingal;
 }
 
 // f'(net) method in different active functions
-- (double)_fDashOfNet:(double)_outputValue
+- (double)partialOfNet:(double)value
 {
-    double _dashedValue = 0.0f;
+    KRDeltaPartial *partial = self.activation.partial;
+    double partialValue = value;
     switch (self.activeFunction)
     {
-        case KRDeltaActiveFunctionTanh:
-            _dashedValue = [self.activation partialTanh:_outputValue slope:1.0f];
+        case KRDeltaActivationTanh:
+            partialValue = [partial tanh:value slope:1.0f];
             break;
-        case KRDeltaActiveFunctionSigmoid:
-            _dashedValue = [self.activation partialSigmoid:_outputValue slope:1.0f];
+        case KRDeltaActivationSigmoid:
+            partialValue = [partial sigmoid:value slope:1.0f];
             break;
-        case KRDeltaActiveFunctionRBF:
-            _dashedValue = [self.activation partialRBF:_outputValue sigma:self.sigma];
+        case KRDeltaActivationRBF:
+            partialValue = [partial rbf:value sigma:self.sigma];
             break;
-        case KRDeltaActiveFunctionSgn:
+        case KRDeltaActivationSGN:
+            partialValue = [partial sgn:value];
+            break;
+        case KRDeltaActivationReLU:
+            partialValue = [partial reLU:value];
+            break;
+        case KRDeltaActivationELU:
+            partialValue = [partial eLU:value];
+            break;
+        case KRDeltaActivationLeakyReLU:
+            partialValue = [partial leakyReLU:value];
+            break;
         default:
-            _dashedValue = [self.activation partialSgn:_outputValue];
             break;
     }
-    return _dashedValue;
+    return partialValue;
 }
 
-- (double)_calculateIterationError
+- (double)calculateIterationError
 {
     // Delta method defined formula of cost function
     return (self.sumError / [self.patterns count]) * 0.5f;
 }
 
-- (void)_sumError:(double)_errorValue
+- (void)sumError:(double)_errorValue
 {
     self.sumError += ( _errorValue * _errorValue );
 }
 
-- (void)_turningWeightsByInputs:(NSArray *)_inputs targetValue:(double)_targetValue
+// 判斷活化函式是否為線性
+- (BOOL)isLinear
 {
-    NSArray *_weights      = self.weights;
-    float _learningRate    = self.learningRate;
-    double _netOutput      = [self _fOfNetWithInputs:_inputs];
-    double _errorValue     = _targetValue - _netOutput;
-    double _dashOutput     = [self _fDashOfNet:_netOutput];
+    BOOL isLinearFunction = YES;
+    switch (self.activeFunction)
+    {
+        case KRDeltaActivationTanh:
+        case KRDeltaActivationSigmoid:
+        case KRDeltaActivationRBF:
+            isLinearFunction = NO;
+            break;
+        default:
+            break;
+    }
+    return isLinearFunction;
+}
+
+- (void)turningWeightsByInputs:(NSArray *)inputs targetValue:(double)targetValue
+{
+    double _netInput          = [self sumNetInput:inputs];
+    double _netOutput         = [self activate:_netInput];
+    double _errorValue        = targetValue - _netOutput;
+    double _derivedActivation = [self partialOfNet:([self isLinear] ? _netInput : _netOutput)];
     
     // new weights = learning rate * (target value - net output) * f'(net) * x1 + w1
-    double _sigmaValue     = _learningRate * _errorValue * _dashOutput;
-    NSArray *_deltaWeights = [self.math multiplyMatrix:_inputs byNumber:_sigmaValue];
-    NSArray *_newWeights   = [self.math plusMatrix:_weights anotherMatrix:_deltaWeights];
+    double _deltaValue     = _errorValue * _derivedActivation;
+    NSArray *_deltaWeights = [self.math multiplyMatrix:inputs byNumber:(self.learningRate * _deltaValue)];
+    NSArray *_newWeights   = [self.math plusMatrix:self.weights anotherMatrix:_deltaWeights];
     
     [self.weights removeAllObjects];
     [self.weights addObjectsFromArray:_newWeights];
     
-    [self _sumError:_errorValue];
+    [self sumError:_errorValue];
 }
 
 @end
@@ -159,7 +197,7 @@
         _convergenceValue = 0.0f;
         _sigma            = 2.0f;
         
-        _activeFunction   = KRDeltaActiveFunctionTanh;
+        _activeFunction   = KRDeltaActivationTanh;
         _activation       = [[KRDeltaActivation alloc] init];
         _math             = [[KRDeltaMath alloc] init];
     }
@@ -210,11 +248,11 @@
     for( NSArray *_inputs in _patterns )
     {
         ++_patternIndex;
-        [self _turningWeightsByInputs:_inputs targetValue:[[_targets objectAtIndex:_patternIndex] doubleValue]];
+        [self turningWeightsByInputs:_inputs targetValue:[[_targets objectAtIndex:_patternIndex] doubleValue]];
     }
     
     // One iteration done then doing next adjust conditions
-    if( _iteration >= _maxIteration || [self _calculateIterationError] <= _convergenceValue )
+    if( _iteration >= _maxIteration || [self calculateIterationError] <= _convergenceValue )
     {
         if( nil != _trainingCompletion )
         {
@@ -245,7 +283,7 @@
 
 - (void)directOutputByPatterns:(NSArray *)_inputs completion:(KRDeltaDirectOutput)_completionBlock
 {
-    double _netOutput = [self _fOfNetWithInputs:_inputs];
+    double _netOutput = [self activate:[self sumNetInput:_inputs]];
     if( nil != _completionBlock )
     {
         _completionBlock(@[[NSNumber numberWithDouble:_netOutput]]);

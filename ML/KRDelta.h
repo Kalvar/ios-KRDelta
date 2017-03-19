@@ -10,10 +10,13 @@
 
 typedef NS_ENUM(NSInteger, KRDeltaActiveFunctions)
 {
-    KRDeltaActiveFunctionSgn  = 0, // Sign Function 符號函數
-    KRDeltaActiveFunctionTanh,     // Hyperbolic Tangent 雙曲正切函數
-    KRDeltaActiveFunctionSigmoid,  // Sigmoid S形函數
-    KRDeltaActiveFunctionRBF       // RBF 高斯函數
+    KRDeltaActivationSGN = 0,  // Sign Function 符號函數
+    KRDeltaActivationTanh,     // Hyperbolic Tangent 雙曲正切函數
+    KRDeltaActivationSigmoid,  // Sigmoid S形函數
+    KRDeltaActivationRBF,      // RBF 高斯函數
+    KRDeltaActivationReLU,
+    KRDeltaActivationELU,
+    KRDeltaActivationLeakyReLU
 };
 
 typedef void(^KRDeltaCompletion)(BOOL success, NSArray *weights, NSInteger totalIteration);
@@ -27,7 +30,7 @@ typedef void(^KRDeltaDirectOutput)(NSArray *outputs);
 @property (nonatomic, strong) NSMutableArray *targets;
 @property (nonatomic, assign) double learningRate;
 @property (nonatomic, assign) NSInteger maxIteration;
-@property (nonatomic, assign) float convergenceValue;
+@property (nonatomic, assign) double convergenceValue;
 @property (nonatomic, assign) double sigma;
 
 @property (nonatomic, assign) KRDeltaActiveFunctions activeFunction;

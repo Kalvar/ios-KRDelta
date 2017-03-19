@@ -14,6 +14,7 @@
 		8E24E5671BE913D20092A2BD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E24E5661BE913D20092A2BD /* Assets.xcassets */; };
 		8E24E56A1BE913D20092A2BD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8E24E5681BE913D20092A2BD /* LaunchScreen.storyboard */; };
 		8E24E5741BE914030092A2BD /* KRDelta.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E24E5731BE914030092A2BD /* KRDelta.m */; };
+		8EC3B77E1E7B920D00150B15 /* KRDeltaPartial.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EC3B77D1E7B920D00150B15 /* KRDeltaPartial.m */; };
 		B891ACCE1DF68B3E0094BB64 /* KRDeltaActivation.m in Sources */ = {isa = PBXBuildFile; fileRef = B891ACCD1DF68B3E0094BB64 /* KRDeltaActivation.m */; };
 		B891ACD21DF6929E0094BB64 /* KRDeltaMath.m in Sources */ = {isa = PBXBuildFile; fileRef = B891ACD11DF6929E0094BB64 /* KRDeltaMath.m */; };
 		B891ACD71DF697850094BB64 /* KRDeltaFetcher.m in Sources */ = {isa = PBXBuildFile; fileRef = B891ACD61DF697850094BB64 /* KRDeltaFetcher.m */; };
@@ -32,6 +33,8 @@
 		8E24E56B1BE913D20092A2BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8E24E5721BE914030092A2BD /* KRDelta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KRDelta.h; sourceTree = "<group>"; };
 		8E24E5731BE914030092A2BD /* KRDelta.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KRDelta.m; sourceTree = "<group>"; };
+		8EC3B77C1E7B920D00150B15 /* KRDeltaPartial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KRDeltaPartial.h; sourceTree = "<group>"; };
+		8EC3B77D1E7B920D00150B15 /* KRDeltaPartial.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KRDeltaPartial.m; sourceTree = "<group>"; };
 		B891ACCC1DF68B3E0094BB64 /* KRDeltaActivation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KRDeltaActivation.h; sourceTree = "<group>"; };
 		B891ACCD1DF68B3E0094BB64 /* KRDeltaActivation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KRDeltaActivation.m; sourceTree = "<group>"; };
 		B891ACD01DF6929E0094BB64 /* KRDeltaMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KRDeltaMath.h; sourceTree = "<group>"; };
@@ -109,6 +112,8 @@
 			children = (
 				B891ACCC1DF68B3E0094BB64 /* KRDeltaActivation.h */,
 				B891ACCD1DF68B3E0094BB64 /* KRDeltaActivation.m */,
+				8EC3B77C1E7B920D00150B15 /* KRDeltaPartial.h */,
+				8EC3B77D1E7B920D00150B15 /* KRDeltaPartial.m */,
 			);
 			path = Activations;
 			sourceTree = "<group>";
@@ -208,6 +213,7 @@
 				8E24E55F1BE913D20092A2BD /* AppDelegate.m in Sources */,
 				8E24E55C1BE913D20092A2BD /* main.m in Sources */,
 				8E24E5741BE914030092A2BD /* KRDelta.m in Sources */,
+				8EC3B77E1E7B920D00150B15 /* KRDeltaPartial.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

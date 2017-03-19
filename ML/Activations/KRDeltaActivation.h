@@ -6,18 +6,18 @@
 //  Copyright © 2016年 Kalvar Lin. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import "KRDeltaPartial.h"
 
 @interface KRDeltaActivation : NSObject
 
+@property (nonatomic) KRDeltaPartial *partial;
+
 - (double)tanh:(double)x slope:(double)slope;
 - (double)sigmoid:(double)x slope:(double)slope;
-- (float)sgn:(double)x;
+- (double)sgn:(double)x;
 - (double)rbf:(double)x sigma:(double)sigma;
-
-- (double)partialTanh:(double)x slope:(double)slope;
-- (double)partialSigmoid:(double)x slope:(double)slope;
-- (double)partialRBF:(double)x sigma:(double)sigma;
-- (double)partialSgn:(double)x;
+- (double)reLU:(double)x;
+- (double)leakyReLU:(double)x;
+- (double)eLU:(double)x;
 
 @end

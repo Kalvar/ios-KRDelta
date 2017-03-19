@@ -20,10 +20,10 @@
     [super viewDidLoad];
     
     KRDelta *delta         = [KRDelta sharedDelta];
-    delta.activeFunction   = KRDeltaActiveFunctionTanh;
+    delta.activeFunction   = KRDeltaActivationTanh;
     delta.learningRate     = 0.8f;
     delta.convergenceValue = 0.001f;
-    delta.maxIteration     = 1000;
+    delta.maxIteration     = 100;
     [delta addPatterns:@[@1.0f, @-2.0f, @0.0f, @-1.0f] target:-1.0f];
     [delta addPatterns:@[@0.0f, @1.5f, @-0.5f, @-1.0f] target:1.0f];
     
