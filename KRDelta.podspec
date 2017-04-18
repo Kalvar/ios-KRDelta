@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "KRDelta"
-  s.version      = "1.3.0"
+  s.version      = "1.4.0"
   s.summary      = "KRDelta implemented by Delta Learning Method of Machine Learning that is a supervisor and gradient method."
   s.description  = <<-DESC
                    This classic algorithm could do micro-analysis on mobile as well, we proved its benefit on our mobile businesses.

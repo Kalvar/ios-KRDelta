@@ -6,7 +6,7 @@ KRDelta is an supervised learning by Delta Learning method of machine learning, 
 
 ```ruby
 platform :ios, '8.0'
-pod 'KRDelta', '~> 1.3.0'
+pod 'KRDelta', '~> 1.4.0'
 ```
 
 ## How To Get Started
@@ -50,9 +50,18 @@ KRDelta *trainedDelta = [[KRDeltaFetcher sharedFetcher] objectForKey:@"A1"];
 [delta setupWeights:@[@1.0f, @-1.0f, @0.0f, @0.5f]];
 ```
 
+#### Batch Learning
+``` objective-c
+[delta setBeforeUpdate:^BOOL(NSInteger iteration, NSArray *deltaWeights){
+    // YES: keep training.
+    // NO:  stop continue.
+    return YES;
+}];
+```
+
 ## Version
 
-V1.3.0
+V1.4.0
 
 ## LICENSE
 

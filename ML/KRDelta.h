@@ -22,6 +22,7 @@ typedef NS_ENUM(NSInteger, KRDeltaActiveFunctions)
 typedef void(^KRDeltaCompletion)(BOOL success, NSArray *weights, NSInteger totalIteration);
 typedef void(^KRDeltaIteration)(NSInteger iteration, NSArray *weights);
 typedef void(^KRDeltaDirectOutput)(NSArray *outputs);
+typedef BOOL(^KRDeltaBeforeUpdate)(NSInteger iteration, NSArray *deltaWeights);
 
 @interface KRDelta : NSObject <NSCoding>
 
@@ -37,6 +38,7 @@ typedef void(^KRDeltaDirectOutput)(NSArray *outputs);
 
 @property (nonatomic, copy) KRDeltaCompletion trainingCompletion;
 @property (nonatomic, copy) KRDeltaIteration trainingIteraion;
+@property (nonatomic, copy) KRDeltaBeforeUpdate beforeUpdate;
 
 + (instancetype)sharedDelta;
 - (instancetype)init;
@@ -45,6 +47,7 @@ typedef void(^KRDeltaDirectOutput)(NSArray *outputs);
 - (void)setupWeights:(NSArray *)_initWeights;
 - (void)setupRandomMin:(float)_min max:(float)_max;
 - (void)randomWeights;
+- (void)updateWeightsFromChanges:(NSArray *)_weightChanges;
 
 - (void)training;
 - (void)trainingWithCompletion:(KRDeltaCompletion)_completionBlock;

@@ -156,11 +156,18 @@
     // new weights = learning rate * (target value - net output) * f'(net) * x1 + w1
     double _deltaValue     = _errorValue * _derivedActivation;
     NSArray *_deltaWeights = [self.math multiplyMatrix:inputs byNumber:(self.learningRate * _deltaValue)];
-    NSArray *_newWeights   = [self.math plusMatrix:self.weights anotherMatrix:_deltaWeights];
     
-    [self.weights removeAllObjects];
-    [self.weights addObjectsFromArray:_newWeights];
+    // Before updating the weights, the block can return NO to stop the update missions.
+    if( nil != self.beforeUpdate )
+    {
+        BOOL stopUpdate = !self.beforeUpdate(self.iteration, _deltaWeights);
+        if( stopUpdate )
+        {
+            return;
+        }
+    }
     
+    [self updateWeightsFromChanges:_deltaWeights];
     [self sumError:_errorValue];
 }
 
@@ -240,6 +247,13 @@
     }
 }
 
+- (void)updateWeightsFromChanges:(NSArray *)_weightChanges
+{
+    NSArray *_newWeights = [_math plusMatrix:_weights anotherMatrix:_weightChanges];
+    [_weights removeAllObjects];
+    [_weights addObjectsFromArray:_newWeights];
+}
+
 - (void)training
 {
     ++_iteration;
@@ -291,14 +305,19 @@
 }
 
 #pragma --mark Block Setters
-- (void)setTrainingCompletion:(KRDeltaCompletion)_block
+- (void)setTrainingCompletion:(KRDeltaCompletion)block
 {
-    _trainingCompletion = _block;
+    _trainingCompletion = block;
 }
 
-- (void)setTrainingIteraion:(KRDeltaIteration)_block
+- (void)setTrainingIteraion:(KRDeltaIteration)block
 {
-    _trainingIteraion = _block;
+    _trainingIteraion = block;
+}
+
+- (void)setBeforeUpdate:(KRDeltaBeforeUpdate)block
+{
+    _beforeUpdate = block;
 }
 
 #pragma --mark NSCoding
