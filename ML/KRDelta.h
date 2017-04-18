@@ -51,10 +51,12 @@ typedef BOOL(^KRDeltaBeforeUpdate)(NSInteger iteration, NSArray *deltaWeights);
 
 - (void)training;
 - (void)trainingWithCompletion:(KRDeltaCompletion)_completionBlock;
+- (void)trainingWithBeforeUpdate:(KRDeltaBeforeUpdate)beforeUpdate completion:(KRDeltaCompletion)completion;
 - (void)trainingWithIteration:(KRDeltaIteration)_iterationBlock completion:(KRDeltaCompletion)_completionBlock;
 - (void)directOutputByPatterns:(NSArray *)_inputs completion:(KRDeltaDirectOutput)_completionBlock;
 
-- (void)setTrainingCompletion:(KRDeltaCompletion)_block;
-- (void)setTrainingIteraion:(KRDeltaIteration)_block;
+- (void)setTrainingCompletion:(KRDeltaCompletion)block;
+- (void)setTrainingIteraion:(KRDeltaIteration)block;
+- (void)setBeforeUpdate:(KRDeltaBeforeUpdate)block;
 
 @end

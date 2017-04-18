@@ -289,6 +289,12 @@
     [self training];
 }
 
+- (void)trainingWithBeforeUpdate:(KRDeltaBeforeUpdate)beforeUpdate completion:(KRDeltaCompletion)completion
+{
+    _beforeUpdate = beforeUpdate;
+    [self trainingWithCompletion:completion];
+}
+
 - (void)trainingWithIteration:(KRDeltaIteration)_iterationBlock completion:(KRDeltaCompletion)_completionBlock
 {
     _trainingIteraion = _iterationBlock;

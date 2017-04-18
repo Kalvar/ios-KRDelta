@@ -6,7 +6,7 @@ KRDelta is an supervised learning by Delta Learning method of machine learning, 
 
 ```ruby
 platform :ios, '8.0'
-pod 'KRDelta', '~> 1.4.0'
+pod 'KRDelta', '~> 1.4.1'
 ```
 
 ## How To Get Started
@@ -61,7 +61,7 @@ KRDelta *trainedDelta = [[KRDeltaFetcher sharedFetcher] objectForKey:@"A1"];
 
 ## Version
 
-V1.4.0
+V1.4.1
 
 ## LICENSE
 
