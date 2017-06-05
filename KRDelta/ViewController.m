@@ -19,11 +19,12 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    KRDelta *delta         = [KRDelta sharedDelta];
-    delta.activeFunction   = KRDeltaActivationTanh;
-    delta.learningRate     = 0.8f;
-    delta.convergenceValue = 0.001f;
-    delta.maxIteration     = 100;
+    KRDelta *delta            = [KRDelta sharedDelta];
+    delta.activeFunction      = KRDeltaActivationTanh;
+    delta.optimization.method = KRDeltaOptimizationFixedInertia;
+    delta.learningRate        = 0.8f;
+    delta.convergenceValue    = 0.001f;
+    delta.maxIteration        = 100;
     [delta addPatterns:@[@1.0f, @-2.0f, @0.0f, @-1.0f] target:-1.0f];
     [delta addPatterns:@[@0.0f, @1.5f, @-0.5f, @-1.0f] target:1.0f];
     

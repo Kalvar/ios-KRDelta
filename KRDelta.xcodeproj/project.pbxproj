@@ -14,6 +14,7 @@
 		8E24E5671BE913D20092A2BD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E24E5661BE913D20092A2BD /* Assets.xcassets */; };
 		8E24E56A1BE913D20092A2BD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8E24E5681BE913D20092A2BD /* LaunchScreen.storyboard */; };
 		8E24E5741BE914030092A2BD /* KRDelta.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E24E5731BE914030092A2BD /* KRDelta.m */; };
+		8E6A0D7C1EE53CA8008FA44A /* KRDeltaOptimization.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E6A0D7B1EE53CA8008FA44A /* KRDeltaOptimization.m */; };
 		8EC3B77E1E7B920D00150B15 /* KRDeltaPartial.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EC3B77D1E7B920D00150B15 /* KRDeltaPartial.m */; };
 		B891ACCE1DF68B3E0094BB64 /* KRDeltaActivation.m in Sources */ = {isa = PBXBuildFile; fileRef = B891ACCD1DF68B3E0094BB64 /* KRDeltaActivation.m */; };
 		B891ACD21DF6929E0094BB64 /* KRDeltaMath.m in Sources */ = {isa = PBXBuildFile; fileRef = B891ACD11DF6929E0094BB64 /* KRDeltaMath.m */; };
@@ -33,6 +34,8 @@
 		8E24E56B1BE913D20092A2BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8E24E5721BE914030092A2BD /* KRDelta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KRDelta.h; sourceTree = "<group>"; };
 		8E24E5731BE914030092A2BD /* KRDelta.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KRDelta.m; sourceTree = "<group>"; };
+		8E6A0D7A1EE53CA8008FA44A /* KRDeltaOptimization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KRDeltaOptimization.h; sourceTree = "<group>"; };
+		8E6A0D7B1EE53CA8008FA44A /* KRDeltaOptimization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KRDeltaOptimization.m; sourceTree = "<group>"; };
 		8EC3B77C1E7B920D00150B15 /* KRDeltaPartial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KRDeltaPartial.h; sourceTree = "<group>"; };
 		8EC3B77D1E7B920D00150B15 /* KRDeltaPartial.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KRDeltaPartial.m; sourceTree = "<group>"; };
 		B891ACCC1DF68B3E0094BB64 /* KRDeltaActivation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KRDeltaActivation.h; sourceTree = "<group>"; };
@@ -98,6 +101,7 @@
 		8E24E5711BE914030092A2BD /* ML */ = {
 			isa = PBXGroup;
 			children = (
+				8E6A0D791EE5336D008FA44A /* Optimization */,
 				B891ACD41DF697220094BB64 /* Fetcher */,
 				B891ACCF1DF692890094BB64 /* Math */,
 				B891ACCB1DF68B3E0094BB64 /* Activations */,
@@ -105,6 +109,15 @@
 				8E24E5731BE914030092A2BD /* KRDelta.m */,
 			);
 			path = ML;
+			sourceTree = "<group>";
+		};
+		8E6A0D791EE5336D008FA44A /* Optimization */ = {
+			isa = PBXGroup;
+			children = (
+				8E6A0D7A1EE53CA8008FA44A /* KRDeltaOptimization.h */,
+				8E6A0D7B1EE53CA8008FA44A /* KRDeltaOptimization.m */,
+			);
+			path = Optimization;
 			sourceTree = "<group>";
 		};
 		B891ACCB1DF68B3E0094BB64 /* Activations */ = {
@@ -162,7 +175,7 @@
 		8E24E54F1BE913D20092A2BD /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = "Kalvar Lin";
 				TargetAttributes = {
 					8E24E5561BE913D20092A2BD = {
@@ -212,6 +225,7 @@
 				8E24E5621BE913D20092A2BD /* ViewController.m in Sources */,
 				8E24E55F1BE913D20092A2BD /* AppDelegate.m in Sources */,
 				8E24E55C1BE913D20092A2BD /* main.m in Sources */,
+				8E6A0D7C1EE53CA8008FA44A /* KRDeltaOptimization.m in Sources */,
 				8E24E5741BE914030092A2BD /* KRDelta.m in Sources */,
 				8EC3B77E1E7B920D00150B15 /* KRDeltaPartial.m in Sources */,
 			);
@@ -252,8 +266,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -296,8 +312,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";

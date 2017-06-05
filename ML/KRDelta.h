@@ -7,6 +7,7 @@
 //
 
 #import "KRDeltaFetcher.h"
+#import "KRDeltaOptimization.h"
 
 typedef NS_ENUM(NSInteger, KRDeltaActiveFunctions)
 {
@@ -26,15 +27,16 @@ typedef BOOL(^KRDeltaBeforeUpdate)(NSInteger iteration, NSArray *deltaWeights);
 
 @interface KRDelta : NSObject <NSCoding>
 
-@property (nonatomic, strong) NSMutableArray *patterns;
-@property (nonatomic, strong) NSMutableArray *weights;
-@property (nonatomic, strong) NSMutableArray *targets;
+@property (nonatomic, strong) NSMutableArray <NSArray <NSNumber *> *> *patterns;
+@property (nonatomic, strong) NSMutableArray <NSNumber *> *weights;
+@property (nonatomic, strong) NSMutableArray <NSNumber *> *targets;
 @property (nonatomic, assign) double learningRate;
 @property (nonatomic, assign) NSInteger maxIteration;
 @property (nonatomic, assign) double convergenceValue;
 @property (nonatomic, assign) double sigma;
 
 @property (nonatomic, assign) KRDeltaActiveFunctions activeFunction;
+@property (nonatomic, strong) KRDeltaOptimization *optimization;
 
 @property (nonatomic, copy) KRDeltaCompletion trainingCompletion;
 @property (nonatomic, copy) KRDeltaIteration trainingIteraion;

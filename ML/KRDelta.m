@@ -16,8 +16,10 @@
 @property (nonatomic, strong) KRDeltaMath *math;
 @property (nonatomic, assign) NSInteger iteration;
 @property (nonatomic, assign) double sumError; // Iteration errors
-@property (nonatomic, strong) NSMutableArray *randomScopes;
+@property (nonatomic, strong) NSMutableArray <NSNumber *> *randomScopes;
 @property (nonatomic, weak) NSCoder *coder;
+@property (nonatomic, strong) NSMutableArray <NSNumber *> *lastDeltaWeights; // 上一次的權重改變量
+@property (nonatomic, assign) NSInteger updatedTimes;                        // 本次訓練更新的次數
 
 @end
 
@@ -155,7 +157,25 @@
     
     // new weights = learning rate * (target value - net output) * f'(net) * x1 + w1
     double _deltaValue     = _errorValue * _derivedActivation;
-    NSArray *_deltaWeights = [self.math multiplyMatrix:inputs byNumber:(self.learningRate * _deltaValue)];
+    
+    // Setups the optimization parameters.
+    self.optimization.inputs           = inputs;
+    self.optimization.lastDeltaWeights = self.lastDeltaWeights;
+    self.optimization.learningRate     = self.learningRate;
+    self.optimization.deltaValue       = _deltaValue;
+    
+    // The original weights changes: learning rate * delta value
+    // 啟動優化算法 (If needed)
+    NSArray *_deltaWeights = (self.updatedTimes > 0) ? [self.optimization optimizedDeltaWeights] : [self.optimization standardDeltaWeights];
+    
+    self.updatedTimes += 1;
+    
+    // Calculates cost function.
+    [self sumError:_errorValue];
+    
+    // Recording to lastDeltaWeights
+    [self.lastDeltaWeights removeAllObjects];
+    [self.lastDeltaWeights addObjectsFromArray:_deltaWeights];
     
     // Before updating the weights, the block can return NO to stop the update missions.
     if( nil != self.beforeUpdate )
@@ -168,7 +188,35 @@
     }
     
     [self updateWeightsFromChanges:_deltaWeights];
-    [self sumError:_errorValue];
+}
+
+- (void)startTraining
+{
+    self.iteration += 1;
+    self.sumError   = 0.0f;
+    NSInteger _patternIndex = -1;
+    for( NSArray *_inputs in self.patterns )
+    {
+        ++_patternIndex;
+        [self turningWeightsByInputs:_inputs targetValue:[[self.targets objectAtIndex:_patternIndex] doubleValue]];
+    }
+    
+    // One iteration done then doing next adjust conditions
+    if( self.iteration >= self.maxIteration || [self calculateIterationError] <= self.convergenceValue )
+    {
+        if( nil != self.trainingCompletion )
+        {
+            self.trainingCompletion(YES, self.weights, self.iteration);
+        }
+    }
+    else
+    {
+        if( nil != self.trainingIteraion )
+        {
+            self.trainingIteraion(self.iteration, self.weights);
+        }
+        [self startTraining];
+    }
 }
 
 @end
@@ -207,6 +255,10 @@
         _activeFunction   = KRDeltaActivationTanh;
         _activation       = [[KRDeltaActivation alloc] init];
         _math             = [[KRDeltaMath alloc] init];
+        _optimization     = [[KRDeltaOptimization alloc] init];
+        
+        _lastDeltaWeights = [NSMutableArray new];
+        _updatedTimes     = 0;
     }
     return self;
 }
@@ -256,31 +308,8 @@
 
 - (void)training
 {
-    ++_iteration;
-    _sumError               = 0.0f;
-    NSInteger _patternIndex = -1;
-    for( NSArray *_inputs in _patterns )
-    {
-        ++_patternIndex;
-        [self turningWeightsByInputs:_inputs targetValue:[[_targets objectAtIndex:_patternIndex] doubleValue]];
-    }
-    
-    // One iteration done then doing next adjust conditions
-    if( _iteration >= _maxIteration || [self calculateIterationError] <= _convergenceValue )
-    {
-        if( nil != _trainingCompletion )
-        {
-            _trainingCompletion(YES, _weights, _iteration);
-        }
-    }
-    else
-    {
-        if( nil != _trainingIteraion )
-        {
-            _trainingIteraion(_iteration, _weights);
-        }
-        [self training];
-    }
+    _updatedTimes = 0;
+    [self startTraining];
 }
 
 - (void)trainingWithCompletion:(KRDeltaCompletion)_completionBlock
