@@ -55,15 +55,6 @@ KRDelta *trainedDelta = [[KRDeltaFetcher sharedFetcher] objectForKey:@"A1"];
 [delta setupWeights:@[@1.0f, @-1.0f, @0.0f, @0.5f]];
 ```
 
-#### Batch Learning
-``` objective-c
-[delta setBeforeUpdate:^BOOL(NSInteger iteration, NSArray *deltaWeights){
-    // YES: keep training.
-    // NO:  stop continue.
-    return YES;
-}];
-```
-
 ## Version
 
 V1.6.0
