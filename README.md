@@ -5,8 +5,8 @@ KRDelta is a supervised learning which Delta rule of Machine Learning, it still 
 #### Podfile
 
 ```ruby
-platform :ios, '9.0'
-pod 'KRDelta', '~> 1.5.0'
+platform :ios, '8.0'
+pod 'KRDelta', '~> 1.5.1'
 ```
 
 ## How To Get Started
