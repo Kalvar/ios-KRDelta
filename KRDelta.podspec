@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "KRDelta"
-  s.version      = "1.5.1"
+  s.version      = "1.6.0"
   s.summary      = "KRDelta is a supervised learning which Delta rule of Machine Learning."
   s.description  = <<-DESC
                    It still works in recommendation system and real-time user behavior analysis on mobile apps.

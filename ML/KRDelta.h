@@ -9,6 +9,8 @@
 #import "KRDeltaFetcher.h"
 #import "KRDeltaOptimization.h"
 
+static NSInteger kKRDeltaFullBatch = 0;
+
 typedef NS_ENUM(NSInteger, KRDeltaActiveFunctions)
 {
     KRDeltaActivationSGN = 0,  // Sign Function 符號函數
@@ -20,10 +22,10 @@ typedef NS_ENUM(NSInteger, KRDeltaActiveFunctions)
     KRDeltaActivationLeakyReLU
 };
 
-typedef void(^KRDeltaCompletion)(BOOL success, NSArray *weights, NSInteger totalIteration);
-typedef void(^KRDeltaIteration)(NSInteger iteration, NSArray *weights);
-typedef void(^KRDeltaDirectOutput)(NSArray *outputs);
-typedef BOOL(^KRDeltaBeforeUpdate)(NSInteger iteration, NSArray *deltaWeights);
+typedef void(^KRDeltaCompletion)(BOOL success, NSArray <NSNumber *> *weights, NSInteger totalIteration);
+typedef void(^KRDeltaIteration)(NSInteger iteration, NSArray <NSNumber *> *weights);
+typedef void(^KRDeltaDirectOutput)(NSArray <NSNumber *> *outputs);
+typedef void(^KRDeltaBeforeUpdate)(NSInteger iteration, NSArray <NSNumber *> *deltaWeights, NSArray <NSNumber *> *lastDeltaWeights);
 
 @interface KRDelta : NSObject <NSCoding>
 
@@ -34,6 +36,7 @@ typedef BOOL(^KRDeltaBeforeUpdate)(NSInteger iteration, NSArray *deltaWeights);
 @property (nonatomic, assign) NSInteger maxIteration;
 @property (nonatomic, assign) double convergenceValue;
 @property (nonatomic, assign) double sigma;
+@property (nonatomic, assign) NSInteger batchSize; // 0: full batch learning, >= 1: mini batch if equals 1 that means normal SGD steps.
 
 @property (nonatomic, assign) KRDeltaActiveFunctions activeFunction;
 @property (nonatomic, strong) KRDeltaOptimization *optimization;

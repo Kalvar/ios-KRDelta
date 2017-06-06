@@ -19,15 +19,21 @@ typedef NS_ENUM(NSInteger, KRDeltaOptimizationMethods)
 @property (nonatomic) double fixedInertia;
 @property (nonatomic) KRDeltaOptimizationMethods method;
 @property (nonatomic) NSArray <NSNumber *> *inputs;
-@property (nonatomic) NSArray <NSNumber *> *lastDeltaWeights;
+@property (nonatomic) NSMutableArray <NSNumber *> *lastDeltaWeights; // 上一次的權重改變量
 @property (nonatomic) double learningRate; // Global learning rate.
 @property (nonatomic) double deltaValue;   // Current delta value.
+@property (nonatomic) NSMutableArray <NSArray <NSNumber *> *> *deltaChanges; // Standard SGD weight-changes: learning rate * delta value
 
 + (instancetype)shared;
 - (instancetype)initWithOptimization:(KRDeltaOptimizationMethods)method;
 - (instancetype)init;
 
-- (NSArray <NSNumber *> *)optimizedDeltaWeights;
-- (NSArray <NSNumber *> *)standardDeltaWeights;
+- (void)recordLastDeltaWeights:(NSArray <NSNumber *> *)lastChanges;
+- (void)addDeltaChanges:(NSArray <NSNumber *> *)changes;
+- (void)cleanDeltaChanges;
+
+- (void)runStandardSGD;
+- (NSArray <NSNumber *> *)standardBatchChanges;
+- (NSArray <NSNumber *> *)optmizedBatchChanges;
 
 @end

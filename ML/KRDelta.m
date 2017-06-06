@@ -18,8 +18,6 @@
 @property (nonatomic, assign) double sumError; // Iteration errors
 @property (nonatomic, strong) NSMutableArray <NSNumber *> *randomScopes;
 @property (nonatomic, weak) NSCoder *coder;
-@property (nonatomic, strong) NSMutableArray <NSNumber *> *lastDeltaWeights; // 上一次的權重改變量
-@property (nonatomic, assign) NSInteger updatedTimes;                        // 本次訓練更新的次數
 
 @end
 
@@ -148,57 +146,71 @@
     return isLinearFunction;
 }
 
-- (void)turningWeightsByInputs:(NSArray *)inputs targetValue:(double)targetValue
+- (double)deltaValueByInputs:(NSArray *)inputs targetValue:(double)targetValue
 {
-    double _netInput          = [self sumNetInput:inputs];
-    double _netOutput         = [self activate:_netInput];
-    double _errorValue        = targetValue - _netOutput;
-    double _derivedActivation = [self partialOfNet:([self isLinear] ? _netInput : _netOutput)];
-    
-    // new weights = learning rate * (target value - net output) * f'(net) * x1 + w1
-    double _deltaValue     = _errorValue * _derivedActivation;
-    
-    // Setups the optimization parameters.
-    self.optimization.inputs           = inputs;
-    self.optimization.lastDeltaWeights = self.lastDeltaWeights;
-    self.optimization.learningRate     = self.learningRate;
-    self.optimization.deltaValue       = _deltaValue;
-    
-    // The original weights changes: learning rate * delta value
-    // 啟動優化算法 (If needed)
-    NSArray *_deltaWeights = (self.updatedTimes > 0) ? [self.optimization optimizedDeltaWeights] : [self.optimization standardDeltaWeights];
-    
-    self.updatedTimes += 1;
+    double netInput          = [self sumNetInput:inputs];
+    double netOutput         = [self activate:netInput];
+    double errorValue        = targetValue - netOutput;
+    double derivedActivation = [self partialOfNet:([self isLinear] ? netInput : netOutput)];
     
     // Calculates cost function.
-    [self sumError:_errorValue];
+    [self sumError:errorValue];
     
-    // Recording to lastDeltaWeights
-    [self.lastDeltaWeights removeAllObjects];
-    [self.lastDeltaWeights addObjectsFromArray:_deltaWeights];
+    // new weights = learning rate * (target value - net output) * f'(net) * x1 + w1
+    double deltaValue = errorValue * derivedActivation;
     
-    // Before updating the weights, the block can return NO to stop the update missions.
+    return deltaValue;
+}
+
+- (void)runBatch
+{
+    NSArray *deltaWeights = [self.optimization optmizedBatchChanges];
+    
+    // Before updating the weights.
     if( nil != self.beforeUpdate )
     {
-        BOOL stopUpdate = !self.beforeUpdate(self.iteration, _deltaWeights);
-        if( stopUpdate )
-        {
-            return;
-        }
+        self.beforeUpdate(self.iteration, deltaWeights, self.optimization.lastDeltaWeights);
     }
     
-    [self updateWeightsFromChanges:_deltaWeights];
+    [self updateWeightsFromChanges:deltaWeights];
 }
 
 - (void)startTraining
 {
-    self.iteration += 1;
-    self.sumError   = 0.0f;
-    NSInteger _patternIndex = -1;
-    for( NSArray *_inputs in self.patterns )
+    self.iteration        += 1;
+    self.sumError          = 0.0f;
+    NSInteger total        = [self.patterns count];
+    NSInteger patternIndex = -1;
+    for(NSArray *inputs in self.patterns)
     {
-        ++_patternIndex;
-        [self turningWeightsByInputs:_inputs targetValue:[[self.targets objectAtIndex:_patternIndex] doubleValue]];
+        patternIndex      += 1;
+        double targetValue = [[self.targets objectAtIndex:patternIndex] doubleValue];
+        double deltaValue  = [self deltaValueByInputs:inputs targetValue:targetValue];
+        
+        // Setups the optimization parameters.
+        self.optimization.inputs           = inputs;
+        self.optimization.learningRate     = self.learningRate;
+        self.optimization.deltaValue       = deltaValue;
+        
+        [self.optimization runStandardSGD];
+        
+        NSInteger currentSize = patternIndex + 1;
+        
+        // 是最後一筆
+        if(currentSize == total)
+        {
+            // 是 Full-Batch 或 Mini-Batch 都會在最後一筆時直接跑這裡
+            // 把所有範本的權重修正列舉出來做優化後，再更新權重
+            [self runBatch];
+        }
+        else
+        {
+            // 是 Mini-Batch && 到達要跑更新的 Batch 數
+            if(self.batchSize > kKRDeltaFullBatch && currentSize > 0 && currentSize % self.batchSize == 0 )
+            {
+                [self runBatch];
+            }
+        }
     }
     
     // One iteration done then doing next adjust conditions
@@ -239,26 +251,24 @@
     if( self )
     {
         _learningRate     = 0.5f;
-        _weights          = [NSMutableArray new];
-        _patterns         = [NSMutableArray new];
-        _targets          = [NSMutableArray new];
+        _weights          = [[NSMutableArray alloc] init];
+        _patterns         = [[NSMutableArray alloc] init];
+        _targets          = [[NSMutableArray alloc] init];
         
         _iteration        = 0;
         _sumError         = 0.0f;
-        _randomScopes     = [NSMutableArray new];
+        _randomScopes     = [[NSMutableArray alloc] init];
         [self setupRandomMin:-0.5f max:0.5f];
         
         _maxIteration     = 1;
         _convergenceValue = 0.0f;
         _sigma            = 2.0f;
+        _batchSize        = 1;
         
         _activeFunction   = KRDeltaActivationTanh;
         _activation       = [[KRDeltaActivation alloc] init];
         _math             = [[KRDeltaMath alloc] init];
         _optimization     = [[KRDeltaOptimization alloc] init];
-        
-        _lastDeltaWeights = [NSMutableArray new];
-        _updatedTimes     = 0;
     }
     return self;
 }
@@ -304,11 +314,13 @@
     NSArray *_newWeights = [_math plusMatrix:_weights anotherMatrix:_weightChanges];
     [_weights removeAllObjects];
     [_weights addObjectsFromArray:_newWeights];
+    
+    // Recording lastDeltaWeights.
+    [_optimization recordLastDeltaWeights:_weightChanges];
 }
 
 - (void)training
 {
-    _updatedTimes = 0;
     [self startTraining];
 }
 

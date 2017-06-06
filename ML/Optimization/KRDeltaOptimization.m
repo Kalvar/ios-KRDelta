@@ -29,8 +29,10 @@
     self = [super init];
     if(self)
     {
-        _fixedInertia = 0.5f;
-        _method       = method;
+        _fixedInertia     = 0.5f;
+        _method           = method;
+        _lastDeltaWeights = [[NSMutableArray alloc] init];
+        _deltaChanges     = [[NSMutableArray alloc] init];
     }
     return self;
 }
@@ -40,15 +42,65 @@
     return [self initWithOptimization:KRDeltaOptimizationDefault];
 }
 
-- (NSArray <NSNumber *> *)optimizedDeltaWeights
+- (void)recordLastDeltaWeights:(NSArray <NSNumber *> *)lastChanges
 {
-    __block NSMutableArray *optimizedWeights = [NSMutableArray new];
-    __block double deltaChanges              = _learningRate * _deltaValue;
+    if(nil != lastChanges)
+    {
+        [_lastDeltaWeights removeAllObjects];
+        [_lastDeltaWeights addObjectsFromArray:lastChanges];
+    }
+}
+
+- (void)addDeltaChanges:(NSArray<NSNumber *> *)changes
+{
+    if(nil != changes)
+    {
+        [_deltaChanges addObject:changes];
+    }
+}
+
+- (void)cleanDeltaChanges
+{
+    [_deltaChanges removeAllObjects];
+}
+
+// Original SGD formula: - learning rate * delta value * input value
+- (void)runStandardSGD
+{
+    NSMutableArray *deltaWeights = [[NSMutableArray alloc] init];
+    double deltaChanges          = _learningRate * _deltaValue;
+    for(NSNumber *input in _inputs)
+    {
+        [deltaWeights addObject:@(deltaChanges * [input doubleValue])];
+    }
+    [self addDeltaChanges:deltaWeights];
+}
+
+- (NSArray <NSNumber *> *)standardBatchChanges
+{
+    __block NSInteger batchCount                 = [_deltaChanges count];
+    __block NSMutableArray <NSNumber *> *changes = [[_deltaChanges firstObject] mutableCopy];
+    [_deltaChanges removeObjectAtIndex:0];
+    // Sum every delta changes, if batchSize = 1, the forloop won't be running.
+    for(NSArray<NSNumber *> *deltaWeights in _deltaChanges)
+    {
+        // Sum and average eachs through forlooping every weight.
+        [deltaWeights enumerateObjectsUsingBlock:^(NSNumber * _Nonnull deltaValue, NSUInteger idx, BOOL * _Nonnull stop) {
+            double nowDeltaValue = [[changes objectAtIndex:idx] doubleValue];
+            changes[idx]         = @((nowDeltaValue + [deltaValue doubleValue]) / batchCount);
+        }];
+    }
+    [self cleanDeltaChanges];
+    return changes;
+}
+
+- (NSArray <NSNumber *> *)optmizedBatchChanges
+{
+    __block NSMutableArray *optimizedChanges = [[NSMutableArray alloc] initWithArray:[self standardBatchChanges]];
     __weak typeof(self) weakSelf             = self;
     [_lastDeltaWeights enumerateObjectsUsingBlock:^(NSNumber * _Nonnull lastDeltaWeight, NSUInteger idx, BOOL * _Nonnull stop) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
-        double input       = [[strongSelf.inputs objectAtIndex:idx] doubleValue];
-        double deltaWeight = deltaChanges * input;
+        double deltaWeight = [[optimizedChanges objectAtIndex:idx] doubleValue]; // SGD delta weight
         switch (_method)
         {
             case KRDeltaOptimizationFixedInertia:
@@ -57,20 +109,9 @@
             default:
                 break;
         }
-        [optimizedWeights addObject:@(deltaWeight)];
+        optimizedChanges[idx] = @(deltaWeight); // Replaces array[idx] item.
     }];
-    return optimizedWeights;
-}
-
-- (NSArray <NSNumber *> *)standardDeltaWeights
-{
-    NSMutableArray *deltaWeights = [NSMutableArray new];
-    double deltaChanges          = _learningRate * _deltaValue;
-    for(NSNumber *input in _inputs)
-    {
-        [deltaWeights addObject:@(deltaChanges * [input doubleValue])];
-    }
-    return deltaWeights;
+    return optimizedChanges;
 }
 
 @end

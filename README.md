@@ -6,7 +6,7 @@ KRDelta is a supervised learning which Delta rule of Machine Learning, it still 
 
 ```ruby
 platform :ios, '8.0'
-pod 'KRDelta', '~> 1.5.1'
+pod 'KRDelta', '~> 1.6.0'
 ```
 
 ## How To Get Started
@@ -21,11 +21,15 @@ pod 'KRDelta', '~> 1.5.1'
 KRDelta *delta         	  = [KRDelta sharedDelta];
 delta.activeFunction   	  = KRDeltaActivationTanh;
 delta.optimization.method = KRDeltaOptimizationFixedInertia;
+delta.batchSize           = 1; // kKRDeltaFullBatch or 0 is full-batch, 1 is standard SGD, > 1 is mini-batch.
 delta.learningRate     	  = 0.8f;
 delta.convergenceValue 	  = 0.001f;
 delta.maxIteration     	  = 100;
 [delta addPatterns:@[@1.0f, @-2.0f, @0.0f, @-1.0f] target:-1.0f];
 [delta addPatterns:@[@0.0f, @1.5f, @-0.5f, @-1.0f] target:1.0f];
+[delta addPatterns:@[@1.0f, @1.0f, @1.5f, @0.5f] target:1.0f];
+[delta addPatterns:@[@2.0f, @0.5f, @-1.5f, @-0.5f] target:1.0f];
+[delta addPatterns:@[@-0.5f, @-1.5f, @0.5f, @1.0f] target:-1.0f];
 [delta setupRandomMin:-0.5f max:0.5f];
 [delta randomWeights];
 [delta trainingWithIteration:^(NSInteger iteration, NSArray *weights) {
@@ -62,7 +66,7 @@ KRDelta *trainedDelta = [[KRDeltaFetcher sharedFetcher] objectForKey:@"A1"];
 
 ## Version
 
-V1.5.0
+V1.6.0
 
 ## LICENSE
 

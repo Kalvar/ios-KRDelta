@@ -22,11 +22,17 @@
     KRDelta *delta            = [KRDelta sharedDelta];
     delta.activeFunction      = KRDeltaActivationTanh;
     delta.optimization.method = KRDeltaOptimizationFixedInertia;
+    delta.optimization.fixedInertia = 0.5f;
+    delta.batchSize           = 1; //kKRDeltaFullBatch
     delta.learningRate        = 0.8f;
     delta.convergenceValue    = 0.001f;
-    delta.maxIteration        = 100;
+    delta.maxIteration        = 5000;
     [delta addPatterns:@[@1.0f, @-2.0f, @0.0f, @-1.0f] target:-1.0f];
     [delta addPatterns:@[@0.0f, @1.5f, @-0.5f, @-1.0f] target:1.0f];
+    
+    [delta addPatterns:@[@1.0f, @1.0f, @1.5f, @0.5f] target:1.0f];
+    [delta addPatterns:@[@2.0f, @0.5f, @-1.5f, @-0.5f] target:1.0f];
+    [delta addPatterns:@[@-0.5f, @-1.5f, @0.5f, @1.0f] target:-1.0f];
     
     [delta setupWeights:@[@1.0f, @-1.0f, @0.0f, @0.5f]];
     //[delta setupRandomMin:-0.5f max:0.5f];
